@@ -1,0 +1,41 @@
+# This is a generated file. Not intended for manual editing.
+services:
+  first.utilities:
+    build:
+      context: "/Users/drewwhis/RiderProjects/FIRST.Utilities"
+      dockerfile: "FIRST.Utilities/FIRST.Utilities/Dockerfile"
+      target: "base"
+    command: []
+    entrypoint:
+    - "dotnet"
+    - "/app/bin/Debug/net8.0/FIRST.Utilities.dll"
+    environment:
+      ASPNETCORE_ENVIRONMENT: "Development"
+      ASPNETCORE_STATICWEBASSETS: "/app/bin/Debug/net8.0/FIRST.Utilities.staticwebassets.runtime.CT.json"
+      DOTNET_USE_POLLING_FILE_WATCHER: "true"
+    image: "first.utilities:dev"
+    ports: []
+    volumes:
+    - "/Users/drewwhis/.nuget/packages:/home/app/.nuget/packages"
+    - "/Users/drewwhis/RiderProjects/FIRST.Utilities/FIRST.Utilities/FIRST.Utilities:/app:rw"
+    - "/Users/drewwhis/RiderProjects/FIRST.Utilities:/src:rw"
+    working_dir: "/app"
+  first.utilities.client:
+    build:
+      context: "/Users/drewwhis/RiderProjects/FIRST.Utilities"
+      dockerfile: "FIRST.Utilities/FIRST.Utilities.Client/Dockerfile"
+      target: "base"
+    command: []
+    entrypoint:
+    - "dotnet"
+    - "/app/../../../../.nuget/packages/microsoft.net.sdk.webassembly.pack/8.0.0/WasmAppHost/WasmAppHost.dll"
+    environment:
+      ASPNETCORE_ENVIRONMENT: "Development"
+      DOTNET_USE_POLLING_FILE_WATCHER: "true"
+    image: "first.utilities.client:dev"
+    ports: []
+    volumes:
+    - "/Users/drewwhis/.nuget/packages:/home/app/.nuget/packages"
+    - "/Users/drewwhis/RiderProjects/FIRST.Utilities/FIRST.Utilities/FIRST.Utilities.Client:/app:rw"
+    - "/Users/drewwhis/RiderProjects/FIRST.Utilities:/src:rw"
+    working_dir: "/app"
