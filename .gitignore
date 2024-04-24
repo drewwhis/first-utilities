@@ -484,7 +484,7 @@ $RECYCLE.BIN/
 *.swp
 
 # Rider
-.idea
+.idea/
 
 # Database
 *.db
