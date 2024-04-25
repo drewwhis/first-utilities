@@ -31,4 +31,8 @@
       <_ContentIncludedByDefault Remove="wwwroot\images\icons\ftc-horizontal.png" />
     </ItemGroup>
 
+    <ItemGroup>
+      <AdditionalFiles Include="Components\Pages\FTC\LoadEvent.razor" />
+    </ItemGroup>
+
 </Project>

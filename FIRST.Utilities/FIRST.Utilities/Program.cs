@@ -1,3 +1,5 @@
+using System.Net.Http.Headers;
+using System.Text;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -5,6 +7,10 @@ using FIRST.Utilities.Client.Pages;
 using FIRST.Utilities.Components;
 using FIRST.Utilities.Components.Account;
 using FIRST.Utilities.Data;
+using FIRST.Utilities.Options;
+using FIRST.Utilities.Services;
+using FIRST.Utilities.Services.Interfaces;
+using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,10 +19,14 @@ builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents()
     .AddInteractiveWebAssemblyComponents();
 
+builder.Services.Configure<FtcApiOptions>(
+    builder.Configuration.GetSection(FtcApiOptions.OptionName));
+
 builder.Services.AddCascadingAuthenticationState();
 builder.Services.AddScoped<IdentityUserAccessor>();
 builder.Services.AddScoped<IdentityRedirectManager>();
 builder.Services.AddScoped<AuthenticationStateProvider, PersistingRevalidatingAuthenticationStateProvider>();
+builder.Services.AddScoped<IFtcApiService, FtcApiService>();
 
 builder.Services.AddAuthentication(options =>
     {
@@ -24,6 +34,21 @@ builder.Services.AddAuthentication(options =>
         options.DefaultSignInScheme = IdentityConstants.ExternalScheme;
     })
     .AddIdentityCookies();
+
+builder.Services.AddHttpClient("ftc-api",(serviceProvider, client) =>
+{
+    var settings = serviceProvider
+        .GetRequiredService<IOptions<FtcApiOptions>>().Value;
+
+    var basicAuthenticationValue = Convert.ToBase64String(
+        Encoding.ASCII.GetBytes(
+            $"{settings.Username}:{settings.Password}"
+        )
+    );
+    
+    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", basicAuthenticationValue);
+    client.BaseAddress = new Uri(settings.BaseUrl);
+});
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ??
                        throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
