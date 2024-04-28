@@ -1,11 +1,11 @@
 using Microsoft.AspNetCore.Components.Routing;
 
-namespace FIRST.Utilities.Client.Layout;
+namespace FIRST.Utilities.Components.Layout;
 
 public partial class NavMenu
 {
-    private static readonly string _downArrow = "bi-caret-down-fill";
-    private static readonly string _rightArrow = "bi-caret-right-fill";
+    private static readonly string DownArrow = "bi-caret-down-fill";
+    private static readonly string RightArrow = "bi-caret-right-fill";
     
     private string? currentUrl;
 

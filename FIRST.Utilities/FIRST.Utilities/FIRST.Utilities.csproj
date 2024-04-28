@@ -4,7 +4,7 @@
         <TargetFramework>net8.0</TargetFramework>
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
-        <UserSecretsId>aspnet-FIRST.Utilities-BD7830B1-0615-4031-B6F5-4269D7DE44FE</UserSecretsId>
+        <UserSecretsId>aspnet-FIRST.Utilities-DE75B29B-5B9A-4118-8B43-2E42A8B83A7F</UserSecretsId>
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     </PropertyGroup>
 
@@ -25,14 +25,6 @@
       <Content Include="..\..\.dockerignore">
         <Link>.dockerignore</Link>
       </Content>
-    </ItemGroup>
-
-    <ItemGroup>
-      <_ContentIncludedByDefault Remove="wwwroot\images\icons\ftc-horizontal.png" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <AdditionalFiles Include="Components\Pages\FTC\LoadEvent.razor" />
     </ItemGroup>
 
 </Project>

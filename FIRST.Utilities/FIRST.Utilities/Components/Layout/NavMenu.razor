@@ -1,6 +1,7 @@
 ﻿@implements IDisposable
 
 @inject NavigationManager NavigationManager
+@rendermode InteractiveServer
 
 <div class="top-row ps-3 navbar navbar-dark">
     <div class="container-fluid">
@@ -20,41 +21,35 @@
 
         <div class="nav-item px-3">
             <NavLink class="nav-link" @onclick="ToggleFtc">
-                <span class="@($"bi {(_expandFtc ? _downArrow : _rightArrow)}")" aria-hidden="true"></span>
+                <span class="@($"bi {(_expandFtc ? DownArrow : RightArrow)}")" aria-hidden="true"></span>
                 <img class="program-logo" src="images/logos/ftc-horizontal.png" alt="FIRST Tech Challenge Logo"/>
             </NavLink>
 
             @if (_expandFtc)
             {
-                <NavLink class="nav-link" href="">
-                    <span class="sub-menu" aria-hidden="true"></span> FTC Page 1
-                </NavLink>
-                <NavLink class="nav-link" href="">
-                    <span class="sub-menu" aria-hidden="true"></span> FTC Page 2
-                </NavLink>
-                <NavLink class="nav-link" href="">
-                    <span class="sub-menu" aria-hidden="true"></span> FTC Page 3
-                </NavLink>
+            <NavLink class="nav-link" href="/ftc/load-event">
+                <span class="sub-menu" aria-hidden="true"></span> Load Event Data
+            </NavLink>
             }
         </div>
 
         <div class="nav-item px-3">
             <NavLink class="nav-link" @onclick="ToggleFllChallenge">
-                <span class="@($"bi {(_expandFllChallenge ? _downArrow : _rightArrow)}")" aria-hidden="true"></span>
+                <span class="@($"bi {(_expandFllChallenge ? DownArrow : RightArrow)}")" aria-hidden="true"></span>
                 <img class="program-logo" src="images/logos/fll-challenge-horizontal.png" alt="FIRST LEGO League Challenge Logo"/>
             </NavLink>
 
             @if (_expandFllChallenge)
             {
-                <NavLink class="nav-link" href="">
-                    <span class="sub-menu" aria-hidden="true"></span> FLLC Page 1
-                </NavLink>
-                <NavLink class="nav-link" href="">
-                    <span class="sub-menu" aria-hidden="true"></span> FLLC Page 2
-                </NavLink>
-                <NavLink class="nav-link" href="">
-                    <span class="sub-menu" aria-hidden="true"></span> FLLC Page 3
-                </NavLink>
+            <NavLink class="nav-link" href="">
+                <span class="sub-menu" aria-hidden="true"></span> FLLC Page 1
+            </NavLink>
+            <NavLink class="nav-link" href="">
+                <span class="sub-menu" aria-hidden="true"></span> FLLC Page 2
+            </NavLink>
+            <NavLink class="nav-link" href="">
+                <span class="sub-menu" aria-hidden="true"></span> FLLC Page 3
+            </NavLink>
             }
         </div>
 

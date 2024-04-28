@@ -10,7 +10,7 @@ namespace FIRST.Utilities.Test.Services;
 
 public class FtcApiServiceTests
 {
-    private IHttpClientFactory GetMockFactory()
+    private static IHttpClientFactory GetMockFactory()
     {
         var configuration = new ConfigurationBuilder()
             .AddUserSecrets<FtcApiOptions>()
@@ -35,7 +35,7 @@ public class FtcApiServiceTests
         return mockFactory.Object;
     }
 
-    private IOptions<FtcApiOptions> GetMockOptions()
+    private static IOptions<FtcApiOptions> GetMockOptions()
     {
         var mockOptions = new Mock<IOptions<FtcApiOptions>>();
         return mockOptions.Object;
