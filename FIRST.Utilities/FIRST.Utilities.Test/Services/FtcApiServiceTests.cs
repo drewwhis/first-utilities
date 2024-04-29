@@ -19,13 +19,13 @@ public class FtcApiServiceTests
 
         var username = configuration.GetValue<string>("FtcApi:Username")!;
         var password = configuration.GetValue<string>("FtcApi:Password")!;
-        
+
         var basicAuthenticationValue = Convert.ToBase64String(
             Encoding.ASCII.GetBytes(
                 $"{username}:{password}"
             )
         );
-        
+
         var mockFactory = new Mock<IHttpClientFactory>();
         var client = new HttpClient
         {
@@ -43,12 +43,12 @@ public class FtcApiServiceTests
             CurrentSeason = 2023,
             EventsEndpoint = "{0}/events"
         };
-        
+
         var mockOptions = new Mock<IOptions<FtcApiOptions>>();
         mockOptions.Setup(o => o.Value).Returns(optionValues);
         return mockOptions.Object;
     }
-    
+
     [Fact]
     public async Task Test_CanConnect()
     {
@@ -70,7 +70,7 @@ public class FtcApiServiceTests
         var result = await service.FetchEventList();
         Assert.NotEmpty(result);
     }
-    
+
     [Theory]
     [InlineData(true, 1)]
     [InlineData(false, 8)]
@@ -81,11 +81,11 @@ public class FtcApiServiceTests
         var factory = GetMockFactory();
         var settings = GetMockOptions();
         var service = new FtcApiService(settings, factory);
-        
+
         var result = await service.FetchEventList(regionCode, areOfficial);
         Assert.Equal(count, result.Count());
     }
-    
+
     [Fact]
     public async Task Test_FetchEventList_WithRegion()
     {
@@ -94,20 +94,21 @@ public class FtcApiServiceTests
         var factory = GetMockFactory();
         var settings = GetMockOptions();
         var service = new FtcApiService(settings, factory);
-        
+
         var result = await service.FetchEventList(regionCode);
         Assert.Equal(9, result.Count());
     }
-    
+
     public static IEnumerable<object[]> FetchEventListIsOfficialTestCases
     {
         get
         {
             yield return [true, (Func<EventDto, bool>)(e => e.TypeName is "Championship" or "Qualifier")];
-            yield return [false, (Func<EventDto, bool>)(e => e.TypeName != "Championship" && e.TypeName != "Qualifier")];
+            yield return
+                [false, (Func<EventDto, bool>)(e => e.TypeName != "Championship" && e.TypeName != "Qualifier")];
         }
     }
-    
+
     [Theory]
     [MemberData(nameof(FetchEventListIsOfficialTestCases))]
     public async Task Test_FetchEventList_IsOfficial(bool areOfficial, Func<EventDto, bool> filter)
@@ -115,9 +116,87 @@ public class FtcApiServiceTests
         var factory = GetMockFactory();
         var settings = GetMockOptions();
         var service = new FtcApiService(settings, factory);
-        
+
         var results = (await service.FetchEventList(areOfficial)).ToList();
         Assert.NotEmpty(results);
         Assert.True(results.All(filter));
+    }
+
+    public static IEnumerable<object[]> FetchEventListEventTypesTestCases
+    {
+        get
+        {
+            yield return
+            [
+                false, false, true,
+                (Func<EventDto, bool>)(e =>
+                    e.TypeName != "Championship" && e.TypeName != "Qualifier" && e.TypeName != "Scrimmage")
+            ];
+            yield return [false, true, false, (Func<EventDto, bool>)(e => e.TypeName is "Scrimmage")];
+            yield return
+            [
+                false, true, true,
+                (Func<EventDto, bool>)(e => e.TypeName != "Championship" && e.TypeName != "Qualifier")
+            ];
+            yield return [true, false, false, (Func<EventDto, bool>)(e => e.TypeName is "Championship" or "Qualifier")];
+            yield return
+            [
+                true, false, true,
+                (Func<EventDto, bool>)(e => e.TypeName is "Championship" or "Qualifier" or not "Scrimmage")
+            ];
+            yield return
+            [
+                true, true, false,
+                (Func<EventDto, bool>)(e => e.TypeName is "Championship" or "Qualifier" or "Scrimmage")
+            ];
+            yield return [true, true, true, (Func<EventDto, bool>)(e => !string.IsNullOrWhiteSpace(e.TypeName))];
+        }
+    }
+
+    [Theory]
+    [MemberData(nameof(FetchEventListEventTypesTestCases))]
+    public async Task Test_FetchEventList_EventTypes(bool includeOfficial, bool includeScrimmages,
+        bool includeOtherEvents, Func<EventDto, bool> filter)
+    {
+        var factory = GetMockFactory();
+        var settings = GetMockOptions();
+        var service = new FtcApiService(settings, factory);
+
+        var results = (await service.FetchEventList(includeOfficial, includeScrimmages, includeOtherEvents)).ToList();
+        Assert.NotEmpty(results);
+        Assert.True(results.All(filter));
+    }
+
+    [Fact]
+    public async Task Test_FetchEventList_NoEventTypes()
+    {
+        var factory = GetMockFactory();
+        var settings = GetMockOptions();
+        var service = new FtcApiService(settings, factory);
+
+        var results = (await service.FetchEventList(false, false, false)).ToList();
+        Assert.Empty(results);
+    }
+
+    [Theory]
+    [InlineData(false, false, false, 0)]
+    [InlineData(false, false, true, 4)]
+    [InlineData(false, true, false, 4)]
+    [InlineData(false, true, true, 8)]
+    [InlineData(true, false, false, 1)]
+    [InlineData(true, false, true, 5)]
+    [InlineData(true, true, false, 5)]
+    [InlineData(true, true, true, 9)]
+    public async Task Test_FetchEventList_EventTypes_WithRegion(bool includeOfficial, bool includeScrimmage,
+        bool includeOthers, int count)
+    {
+        // ReSharper disable once StringLiteralTypo
+        const string regionCode = "USAL";
+        var factory = GetMockFactory();
+        var settings = GetMockOptions();
+        var service = new FtcApiService(settings, factory);
+
+        var result = await service.FetchEventList(regionCode, includeOfficial, includeScrimmage, includeOthers);
+        Assert.Equal(count, result.Count());
     }
 }

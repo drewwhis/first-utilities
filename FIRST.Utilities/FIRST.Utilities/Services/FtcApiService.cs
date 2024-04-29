@@ -32,7 +32,7 @@ public class FtcApiService(
     {
         var types = new HashSet<string> { "Qualifier", "Championship" };
         var results = await FetchEventList();
-        return results.Where(e => !(areOfficial ^ types.Contains(e.TypeName))); 
+        return results.Where(e => !(areOfficial ^ types.Contains(e.TypeName)));
     }
 
     public async Task<IEnumerable<EventDto>> FetchEventList(string regionCode, bool areOfficial)
@@ -43,5 +43,24 @@ public class FtcApiService(
     public async Task<IEnumerable<EventDto>> FetchEventList(string regionCode)
     {
         return (await FetchEventList()).Where(e => e.RegionCode == regionCode).ToList();
+    }
+
+    public async Task<IEnumerable<EventDto>> FetchEventList(bool includeOfficialEvents, bool includeScrimmages,
+        bool includeOtherEvents)
+    {
+        return (await FetchEventList())
+            .Where(e => (includeOfficialEvents && e.TypeName is "Championship" or "Qualifier")
+                        || (includeScrimmages && e.TypeName == "Scrimmage")
+                        || (includeOtherEvents && e.TypeName != "Scrimmage" && e.TypeName != "Championship" &&
+                            e.TypeName != "Qualifier"))
+            .ToList();
+    }
+
+    public async Task<IEnumerable<EventDto>> FetchEventList(string regionCode, bool includeOfficialEvents,
+        bool includeScrimmages, bool includeOtherEvents)
+    {
+        return (await FetchEventList(includeOfficialEvents, includeScrimmages, includeOtherEvents))
+            .Where(e => e.RegionCode == regionCode)
+            .ToList();
     }
 }
