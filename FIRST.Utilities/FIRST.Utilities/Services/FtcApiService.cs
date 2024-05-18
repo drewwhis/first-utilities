@@ -11,7 +11,7 @@ public class FtcApiService(
     : IFtcApiService
 {
     private readonly FtcApiOptions _settings = settings.Value;
-    private static readonly string ApiClientName = "ftc-api";
+    private const string ApiClientName = "ftc-api";
 
     public async Task<bool> CanConnect()
     {
@@ -24,8 +24,16 @@ public class FtcApiService(
     {
         var client = factory.CreateClient(ApiClientName);
         var endpoint = string.Format(_settings.EventsEndpoint, _settings.CurrentSeason);
-        var response = await client.GetFromJsonAsync<EventsDto>(endpoint);
-        return response?.Events ?? Enumerable.Empty<EventDto>();
+
+        try
+        {
+            var response = await client.GetFromJsonAsync<EventsDto>(endpoint);
+            return response?.Events ?? [];
+        }
+        catch
+        {
+            return [];
+        }
     }
 
     public async Task<IEnumerable<EventDto>> FetchEventList(bool areOfficial)
