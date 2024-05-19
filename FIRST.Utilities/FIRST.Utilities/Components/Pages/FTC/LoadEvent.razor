@@ -25,7 +25,7 @@
         </InputSelect>
         <br/>
         <br/>
-        <button class="btn btn-primary" @onclick="SaveSelectedEvent">Choose Event</button>
+        <button class="btn btn-primary" @onclick="SaveSelectedEvent" disabled="@(_activeEvent is not null)">Choose Event</button>
     }
 }
 else

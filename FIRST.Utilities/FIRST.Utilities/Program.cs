@@ -10,6 +10,8 @@ using FIRST.Utilities.Data;
 using FIRST.Utilities.DataServices;
 using FIRST.Utilities.DataServices.Interfaces;
 using FIRST.Utilities.Options;
+using FIRST.Utilities.Repositories;
+using FIRST.Utilities.Repositories.Interfaces;
 using FIRST.Utilities.Services;
 using FIRST.Utilities.Services.Interfaces;
 using Microsoft.Extensions.Options;
@@ -23,15 +25,23 @@ builder.Services.AddRazorComponents()
 
 builder.Services.Configure<FtcApiOptions>(
     builder.Configuration.GetSection(FtcApiOptions.OptionName));
-builder.Services.Configure<FtcOptions>(
-    builder.Configuration.GetSection($"{FirstOptions.OptionName}:{FtcOptions.OptionName}"));
 
 builder.Services.AddCascadingAuthenticationState();
 builder.Services.AddScoped<IdentityUserAccessor>();
 builder.Services.AddScoped<IdentityRedirectManager>();
 builder.Services.AddScoped<AuthenticationStateProvider, PersistingRevalidatingAuthenticationStateProvider>();
+
+// API Services
 builder.Services.AddScoped<IFtcApiService, FtcApiService>();
+
+// Database Services
 builder.Services.AddScoped<IEventDataService, EventDataService>();
+builder.Services.AddScoped<IProgramDataService, ProgramDataService>();
+
+// Repositories
+builder.Services.AddScoped<IProgramRepository, ProgramRepository>();
+builder.Services.AddScoped<IEventRepository, EventRepository>();
+builder.Services.AddScoped<IActiveEventRepository, ActiveEventRepository>();
 
 builder.Services.AddAuthentication(options =>
     {

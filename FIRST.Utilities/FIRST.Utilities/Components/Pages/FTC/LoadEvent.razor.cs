@@ -1,9 +1,7 @@
 using FIRST.Utilities.DataServices.Interfaces;
 using FIRST.Utilities.Models.Database;
-using FIRST.Utilities.Options;
 using FIRST.Utilities.Services.Interfaces;
 using Microsoft.AspNetCore.Components;
-using Microsoft.Extensions.Options;
 
 namespace FIRST.Utilities.Components.Pages.FTC;
 
@@ -16,12 +14,21 @@ public partial class LoadEvent : ComponentBase
     
     [Inject] private IFtcApiService FtcApiService { get; set; } = null!;
     [Inject] private IEventDataService EventDataService { get; set; } = null!;
-    [Inject] private IOptions<FtcOptions> FtcOptions { get; set; } = null!;
+    [Inject] private IProgramDataService ProgramDataService { get; set; } = null!;
 
     protected override void OnInitialized()
     {
+        var ftcRecord = ProgramDataService.GetProgram("FTC");
+        if (ftcRecord is null)
+        {
+            _events = [];
+            _activeEvent = null;
+            _selectedEventCode = null;
+            return;
+        }
+        
         _events = EventDataService
-            .GetEvents(FtcOptions.Value.ProgramCode, FtcOptions.Value.CurrentSeason)
+            .GetEvents(ftcRecord.ProgramCode, ftcRecord.ActiveSeasonYear)
             .OrderBy(e => e.EventName);
         _activeEvent = EventDataService.GetActiveEvent();
         _selectedEventCode = _activeEvent?.EventCode;
@@ -29,6 +36,9 @@ public partial class LoadEvent : ComponentBase
 
     private async Task FetchEventCodes()
     {
+        var ftcRecord = ProgramDataService.GetProgram("FTC");
+        if (ftcRecord is null) return;
+
         _isFetching = true;
         await InvokeAsync(StateHasChanged);
         var fetchedEvents = await FtcApiService.FetchEventList(
@@ -42,13 +52,13 @@ public partial class LoadEvent : ComponentBase
             {
                 EventCode = @event.Code,
                 EventName = @event.Name,
-                ProgramCode = FtcOptions.Value.ProgramCode,
-                SeasonYear = FtcOptions.Value.CurrentSeason
+                ProgramCode = ftcRecord.ProgramCode,
+                SeasonYear = ftcRecord.ActiveSeasonYear
             });
         }
         
         _events = EventDataService
-            .GetEvents(FtcOptions.Value.ProgramCode, FtcOptions.Value.CurrentSeason)
+            .GetEvents(ftcRecord.ProgramCode, ftcRecord.ActiveSeasonYear)
             .OrderBy(e => e.EventName);
         _isFetching = false;
         await InvokeAsync(StateHasChanged);
@@ -56,11 +66,14 @@ public partial class LoadEvent : ComponentBase
     
     private async Task ClearLoadedEvents()
     {
+        var ftcRecord = ProgramDataService.GetProgram("FTC");
+        if (ftcRecord is null) return;
+        
         _isFetching = true;
         await InvokeAsync(StateHasChanged);
 
-        await EventDataService.DeleteEvents(FtcOptions.Value.ProgramCode, FtcOptions.Value.CurrentSeason);
-        _events = EventDataService.GetEvents(FtcOptions.Value.ProgramCode, FtcOptions.Value.CurrentSeason);
+        await EventDataService.DeleteEvents(ftcRecord.ProgramCode, ftcRecord.ActiveSeasonYear);
+        _events = EventDataService.GetEvents(ftcRecord.ProgramCode, ftcRecord.ActiveSeasonYear);
         _activeEvent = EventDataService.GetActiveEvent();
         _selectedEventCode = _activeEvent?.EventCode;
         _isFetching = false;
@@ -70,7 +83,10 @@ public partial class LoadEvent : ComponentBase
     private async Task SaveSelectedEvent()
     {
         if (_selectedEventCode is null) return;
-        await EventDataService.SetActiveEvent(FtcOptions.Value.ProgramCode, _selectedEventCode, FtcOptions.Value.CurrentSeason);
+        var ftcRecord = ProgramDataService.GetProgram("FTC");
+        if (ftcRecord is null) return;
+        
+        await EventDataService.SetActiveEvent(ftcRecord.ProgramCode, _selectedEventCode, ftcRecord.ActiveSeasonYear);
         _activeEvent = EventDataService.GetActiveEvent();
         await InvokeAsync(StateHasChanged);
     }

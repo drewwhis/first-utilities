@@ -9,6 +9,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
 {
     public DbSet<Event> Events { get; set; }
     public DbSet<ActiveEvent> ActiveEvents { get; set; }
+    public DbSet<Models.Database.Program> Programs { get; set; }
     
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -18,5 +19,10 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
             .HasOne(e => e.ActiveEvent)
             .WithOne(a => a.Event)
             .OnDelete(DeleteBehavior.Cascade);
+        
+        modelBuilder
+            .Entity<Models.Database.Program>()
+            .HasData(new Models.Database.Program { ProgramId = 1, ProgramCode = "FTC", ActiveSeasonYear = 2023 });
+
     }
 }

@@ -1,3 +1,4 @@
+using FIRST.Utilities.DataServices.Interfaces;
 using FIRST.Utilities.Models.FtcApi;
 using FIRST.Utilities.Options;
 using FIRST.Utilities.Services.Interfaces;
@@ -7,12 +8,11 @@ namespace FIRST.Utilities.Services;
 
 public class FtcApiService(
     IOptions<FtcApiOptions> ftcApiSettings,
-    IOptions<FtcOptions> ftcSettings,
+    IProgramDataService programDataService,
     IHttpClientFactory factory)
     : IFtcApiService
 {
     private readonly FtcApiOptions _ftcApiSettings = ftcApiSettings.Value;
-    private readonly FtcOptions _ftcSettings = ftcSettings.Value;
     private const string ApiClientName = "ftc-api";
 
     public async Task<bool> CanConnect()
@@ -24,8 +24,11 @@ public class FtcApiService(
 
     public async Task<IEnumerable<EventDto>> FetchEventList()
     {
+        var ftcRecord = programDataService.GetProgram("FTC");
+        if (ftcRecord is null) return [];
+        
         var client = factory.CreateClient(ApiClientName);
-        var endpoint = string.Format(_ftcApiSettings.EventsEndpoint, _ftcSettings.CurrentSeason);
+        var endpoint = string.Format(_ftcApiSettings.EventsEndpoint, ftcRecord.ActiveSeasonYear);
 
         try
         {

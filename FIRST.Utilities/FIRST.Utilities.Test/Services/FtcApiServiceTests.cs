@@ -1,5 +1,7 @@
 using System.Net.Http.Headers;
 using System.Text;
+using FIRST.Utilities.DataServices.Interfaces;
+using FIRST.Utilities.Models.Database;
 using FIRST.Utilities.Models.FtcApi;
 using FIRST.Utilities.Options;
 using FIRST.Utilities.Services;
@@ -48,23 +50,24 @@ public class FtcApiServiceTests
         return ftcApiMockOptions.Object;
     }
 
-    private static IOptions<FtcOptions> GetFtcMockOptions()
+    private static IProgramDataService GetProgramDataServiceMock()
     {
-        var ftcOptionValues = new FtcOptions
+        var mock = new Mock<IProgramDataService>();
+        mock.Setup(s => s.GetProgram("FTC")).Returns(new Program
         {
-            CurrentSeason = 2023
-        };
-
-        var ftcMockOptions = new Mock<IOptions<FtcOptions>>();
-        ftcMockOptions.Setup(o => o.Value).Returns(ftcOptionValues);
-        return ftcMockOptions.Object;
+            ProgramId = 1,
+            ProgramCode = "FTC",
+            ActiveSeasonYear = 2023
+        });
+        
+        return mock.Object;
     }
 
     [Fact]
     public async Task Test_CanConnect()
     {
         var factory = GetMockFactory();
-        var settings = GetFtcMockOptions();
+        var settings = GetProgramDataServiceMock();
         var apiSettings = GetFtcApiMockOptions();
         var service = new FtcApiService(apiSettings, settings, factory);
 
@@ -76,7 +79,7 @@ public class FtcApiServiceTests
     public async Task Test_FetchEventList()
     {
         var factory = GetMockFactory();
-        var settings = GetFtcMockOptions();
+        var settings = GetProgramDataServiceMock();
         var apiSettings = GetFtcApiMockOptions();
         var service = new FtcApiService(apiSettings, settings, factory);
 
@@ -92,7 +95,7 @@ public class FtcApiServiceTests
         // ReSharper disable once StringLiteralTypo
         const string regionCode = "USAL";
         var factory = GetMockFactory();
-        var settings = GetFtcMockOptions();
+        var settings = GetProgramDataServiceMock();
         var apiSettings = GetFtcApiMockOptions();
         var service = new FtcApiService(apiSettings, settings, factory);
 
@@ -106,7 +109,7 @@ public class FtcApiServiceTests
         // ReSharper disable once StringLiteralTypo
         const string regionCode = "USAL";
         var factory = GetMockFactory();
-        var settings = GetFtcMockOptions();
+        var settings = GetProgramDataServiceMock();
         var apiSettings = GetFtcApiMockOptions();
         var service = new FtcApiService(apiSettings, settings, factory);
 
@@ -129,7 +132,7 @@ public class FtcApiServiceTests
     public async Task Test_FetchEventList_IsOfficial(bool areOfficial, Func<EventDto, bool> filter)
     {
         var factory = GetMockFactory();
-        var settings = GetFtcMockOptions();
+        var settings = GetProgramDataServiceMock();
         var apiSettings = GetFtcApiMockOptions();
         var service = new FtcApiService(apiSettings, settings, factory);
 
@@ -175,7 +178,7 @@ public class FtcApiServiceTests
         bool includeOtherEvents, Func<EventDto, bool> filter)
     {
         var factory = GetMockFactory();
-        var settings = GetFtcMockOptions();
+        var settings = GetProgramDataServiceMock();
         var apiSettings = GetFtcApiMockOptions();
         var service = new FtcApiService(apiSettings, settings, factory);
 
@@ -188,7 +191,7 @@ public class FtcApiServiceTests
     public async Task Test_FetchEventList_NoEventTypes()
     {
         var factory = GetMockFactory();
-        var settings = GetFtcMockOptions();
+        var settings = GetProgramDataServiceMock();
         var apiSettings = GetFtcApiMockOptions();
         var service = new FtcApiService(apiSettings, settings, factory);
 
@@ -211,7 +214,7 @@ public class FtcApiServiceTests
         // ReSharper disable once StringLiteralTypo
         const string regionCode = "USAL";
         var factory = GetMockFactory();
-        var settings = GetFtcMockOptions();
+        var settings = GetProgramDataServiceMock();
         var apiSettings = GetFtcApiMockOptions();
         var service = new FtcApiService(apiSettings, settings, factory);
 
