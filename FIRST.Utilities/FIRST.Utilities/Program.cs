@@ -7,6 +7,8 @@ using FIRST.Utilities.Client.Pages;
 using FIRST.Utilities.Components;
 using FIRST.Utilities.Components.Account;
 using FIRST.Utilities.Data;
+using FIRST.Utilities.DataServices;
+using FIRST.Utilities.DataServices.Interfaces;
 using FIRST.Utilities.Options;
 using FIRST.Utilities.Services;
 using FIRST.Utilities.Services.Interfaces;
@@ -21,12 +23,15 @@ builder.Services.AddRazorComponents()
 
 builder.Services.Configure<FtcApiOptions>(
     builder.Configuration.GetSection(FtcApiOptions.OptionName));
+builder.Services.Configure<FtcOptions>(
+    builder.Configuration.GetSection($"{FirstOptions.OptionName}:{FtcOptions.OptionName}"));
 
 builder.Services.AddCascadingAuthenticationState();
 builder.Services.AddScoped<IdentityUserAccessor>();
 builder.Services.AddScoped<IdentityRedirectManager>();
 builder.Services.AddScoped<AuthenticationStateProvider, PersistingRevalidatingAuthenticationStateProvider>();
 builder.Services.AddScoped<IFtcApiService, FtcApiService>();
+builder.Services.AddScoped<IEventDataService, EventDataService>();
 
 builder.Services.AddAuthentication(options =>
     {
@@ -37,17 +42,17 @@ builder.Services.AddAuthentication(options =>
 
 builder.Services.AddHttpClient("ftc-api",(serviceProvider, client) =>
 {
-    var settings = serviceProvider
+    var apiSettings = serviceProvider
         .GetRequiredService<IOptions<FtcApiOptions>>().Value;
-
+    
     var basicAuthenticationValue = Convert.ToBase64String(
         Encoding.ASCII.GetBytes(
-            $"{settings.Username}:{settings.Password}"
+            $"{apiSettings.Username}:{apiSettings.Password}"
         )
     );
     
     client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", basicAuthenticationValue);
-    client.BaseAddress = new Uri(settings.BaseUrl);
+    client.BaseAddress = new Uri(apiSettings.BaseUrl);
 });
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ??

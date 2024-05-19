@@ -36,25 +36,37 @@ public class FtcApiServiceTests
         return mockFactory.Object;
     }
 
-    private static IOptions<FtcApiOptions> GetMockOptions()
+    private static IOptions<FtcApiOptions> GetFtcApiMockOptions()
     {
-        var optionValues = new FtcApiOptions
+        var ftcApiOptionValues = new FtcApiOptions
         {
-            CurrentSeason = 2023,
             EventsEndpoint = "{0}/events"
         };
 
-        var mockOptions = new Mock<IOptions<FtcApiOptions>>();
-        mockOptions.Setup(o => o.Value).Returns(optionValues);
-        return mockOptions.Object;
+        var ftcApiMockOptions = new Mock<IOptions<FtcApiOptions>>();
+        ftcApiMockOptions.Setup(o => o.Value).Returns(ftcApiOptionValues);
+        return ftcApiMockOptions.Object;
+    }
+
+    private static IOptions<FtcOptions> GetFtcMockOptions()
+    {
+        var ftcOptionValues = new FtcOptions
+        {
+            CurrentSeason = 2023
+        };
+
+        var ftcMockOptions = new Mock<IOptions<FtcOptions>>();
+        ftcMockOptions.Setup(o => o.Value).Returns(ftcOptionValues);
+        return ftcMockOptions.Object;
     }
 
     [Fact]
     public async Task Test_CanConnect()
     {
         var factory = GetMockFactory();
-        var settings = GetMockOptions();
-        var service = new FtcApiService(settings, factory);
+        var settings = GetFtcMockOptions();
+        var apiSettings = GetFtcApiMockOptions();
+        var service = new FtcApiService(apiSettings, settings, factory);
 
         var result = await service.CanConnect();
         Assert.True(result);
@@ -64,8 +76,9 @@ public class FtcApiServiceTests
     public async Task Test_FetchEventList()
     {
         var factory = GetMockFactory();
-        var settings = GetMockOptions();
-        var service = new FtcApiService(settings, factory);
+        var settings = GetFtcMockOptions();
+        var apiSettings = GetFtcApiMockOptions();
+        var service = new FtcApiService(apiSettings, settings, factory);
 
         var result = await service.FetchEventList();
         Assert.NotEmpty(result);
@@ -79,8 +92,9 @@ public class FtcApiServiceTests
         // ReSharper disable once StringLiteralTypo
         const string regionCode = "USAL";
         var factory = GetMockFactory();
-        var settings = GetMockOptions();
-        var service = new FtcApiService(settings, factory);
+        var settings = GetFtcMockOptions();
+        var apiSettings = GetFtcApiMockOptions();
+        var service = new FtcApiService(apiSettings, settings, factory);
 
         var result = await service.FetchEventList(regionCode, areOfficial);
         Assert.Equal(count, result.Count());
@@ -92,8 +106,9 @@ public class FtcApiServiceTests
         // ReSharper disable once StringLiteralTypo
         const string regionCode = "USAL";
         var factory = GetMockFactory();
-        var settings = GetMockOptions();
-        var service = new FtcApiService(settings, factory);
+        var settings = GetFtcMockOptions();
+        var apiSettings = GetFtcApiMockOptions();
+        var service = new FtcApiService(apiSettings, settings, factory);
 
         var result = await service.FetchEventList(regionCode);
         Assert.Equal(9, result.Count());
@@ -114,8 +129,9 @@ public class FtcApiServiceTests
     public async Task Test_FetchEventList_IsOfficial(bool areOfficial, Func<EventDto, bool> filter)
     {
         var factory = GetMockFactory();
-        var settings = GetMockOptions();
-        var service = new FtcApiService(settings, factory);
+        var settings = GetFtcMockOptions();
+        var apiSettings = GetFtcApiMockOptions();
+        var service = new FtcApiService(apiSettings, settings, factory);
 
         var results = (await service.FetchEventList(areOfficial)).ToList();
         Assert.NotEmpty(results);
@@ -159,8 +175,9 @@ public class FtcApiServiceTests
         bool includeOtherEvents, Func<EventDto, bool> filter)
     {
         var factory = GetMockFactory();
-        var settings = GetMockOptions();
-        var service = new FtcApiService(settings, factory);
+        var settings = GetFtcMockOptions();
+        var apiSettings = GetFtcApiMockOptions();
+        var service = new FtcApiService(apiSettings, settings, factory);
 
         var results = (await service.FetchEventList(includeOfficial, includeScrimmages, includeOtherEvents)).ToList();
         Assert.NotEmpty(results);
@@ -171,8 +188,9 @@ public class FtcApiServiceTests
     public async Task Test_FetchEventList_NoEventTypes()
     {
         var factory = GetMockFactory();
-        var settings = GetMockOptions();
-        var service = new FtcApiService(settings, factory);
+        var settings = GetFtcMockOptions();
+        var apiSettings = GetFtcApiMockOptions();
+        var service = new FtcApiService(apiSettings, settings, factory);
 
         var results = (await service.FetchEventList(false, false, false)).ToList();
         Assert.Empty(results);
@@ -193,8 +211,9 @@ public class FtcApiServiceTests
         // ReSharper disable once StringLiteralTypo
         const string regionCode = "USAL";
         var factory = GetMockFactory();
-        var settings = GetMockOptions();
-        var service = new FtcApiService(settings, factory);
+        var settings = GetFtcMockOptions();
+        var apiSettings = GetFtcApiMockOptions();
+        var service = new FtcApiService(apiSettings, settings, factory);
 
         var result = await service.FetchEventList(regionCode, includeOfficial, includeScrimmage, includeOthers);
         Assert.Equal(count, result.Count());

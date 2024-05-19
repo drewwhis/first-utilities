@@ -6,11 +6,13 @@ using Microsoft.Extensions.Options;
 namespace FIRST.Utilities.Services;
 
 public class FtcApiService(
-    IOptions<FtcApiOptions> settings,
+    IOptions<FtcApiOptions> ftcApiSettings,
+    IOptions<FtcOptions> ftcSettings,
     IHttpClientFactory factory)
     : IFtcApiService
 {
-    private readonly FtcApiOptions _settings = settings.Value;
+    private readonly FtcApiOptions _ftcApiSettings = ftcApiSettings.Value;
+    private readonly FtcOptions _ftcSettings = ftcSettings.Value;
     private const string ApiClientName = "ftc-api";
 
     public async Task<bool> CanConnect()
@@ -23,12 +25,13 @@ public class FtcApiService(
     public async Task<IEnumerable<EventDto>> FetchEventList()
     {
         var client = factory.CreateClient(ApiClientName);
-        var endpoint = string.Format(_settings.EventsEndpoint, _settings.CurrentSeason);
+        var endpoint = string.Format(_ftcApiSettings.EventsEndpoint, _ftcSettings.CurrentSeason);
 
         try
         {
             var response = await client.GetFromJsonAsync<EventsDto>(endpoint);
-            return response?.Events ?? [];
+            if (response is null) return [];
+            return response.Events ?? [];
         }
         catch
         {

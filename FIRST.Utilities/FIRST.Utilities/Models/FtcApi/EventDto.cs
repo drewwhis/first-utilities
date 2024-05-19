@@ -3,7 +3,7 @@ namespace FIRST.Utilities.Models.FtcApi;
 public class EventDto
 {
     public Guid EventId { get; set; }
-    public string? Code { get; set; }
+    public string Code { get; set; } = null!;
     public string? DivisionCode { get; set; }
     public string? Name { get; set; }
     public bool Remote { get; set; }

@@ -8,4 +8,15 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     : IdentityDbContext<ApplicationUser>(options)
 {
     public DbSet<Event> Events { get; set; }
+    public DbSet<ActiveEvent> ActiveEvents { get; set; }
+    
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        base.OnModelCreating(modelBuilder);
+        modelBuilder
+            .Entity<Event>()
+            .HasOne(e => e.ActiveEvent)
+            .WithOne(a => a.Event)
+            .OnDelete(DeleteBehavior.Cascade);
+    }
 }

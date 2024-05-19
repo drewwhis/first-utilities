@@ -3,6 +3,7 @@ using System;
 using FIRST.Utilities.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FIRST.Utilities.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240519030600_EventTableFieldsMaxLength")]
+    partial class EventTableFieldsMaxLength
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.0");
@@ -79,23 +82,6 @@ namespace FIRST.Utilities.Migrations
                         .HasDatabaseName("UserNameIndex");
 
                     b.ToTable("AspNetUsers", (string)null);
-                });
-
-            modelBuilder.Entity("FIRST.Utilities.Models.Database.ActiveEvent", b =>
-                {
-                    b.Property<int>("ActiveEventId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int?>("EventId")
-                        .HasColumnType("INTEGER");
-
-                    b.HasKey("ActiveEventId");
-
-                    b.HasIndex("EventId")
-                        .IsUnique();
-
-                    b.ToTable("ActiveEvents");
                 });
 
             modelBuilder.Entity("FIRST.Utilities.Models.Database.Event", b =>
@@ -257,16 +243,6 @@ namespace FIRST.Utilities.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("FIRST.Utilities.Models.Database.ActiveEvent", b =>
-                {
-                    b.HasOne("FIRST.Utilities.Models.Database.Event", "Event")
-                        .WithOne("ActiveEvent")
-                        .HasForeignKey("FIRST.Utilities.Models.Database.ActiveEvent", "EventId")
-                        .OnDelete(DeleteBehavior.Cascade);
-
-                    b.Navigation("Event");
-                });
-
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -316,11 +292,6 @@ namespace FIRST.Utilities.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("FIRST.Utilities.Models.Database.Event", b =>
-                {
-                    b.Navigation("ActiveEvent");
                 });
 #pragma warning restore 612, 618
         }

@@ -1,3 +1,36 @@
 @page "/ftc/load-event"
-<h3>Load Event Data</h3>
+@rendermode InteractiveServer
+<PageTitle>Data Load</PageTitle>
+<h1>Data Load</h1>
 
+@if (!_isFetching)
+{
+    <button class="btn btn-primary" @onclick="FetchEventCodes">Load Events from FTC</button>
+    
+    @if (_events.Any())
+    {
+        <button class="btn btn-secondary" @onclick="ClearLoadedEvents">Clear Loaded Events</button>
+    }
+
+    <br/>
+    <br/>
+
+    @if (_events.Any())
+    {
+        <InputSelect @bind-Value="_selectedEventCode" placeholder="Event" disabled="@(_activeEvent is not null)">
+            @foreach (var ftcEvent in _events)
+            {
+                <option value="@ftcEvent.EventCode">@ftcEvent.EventName</option>
+            }
+        </InputSelect>
+        <br/>
+        <br/>
+        <button class="btn btn-primary" @onclick="SaveSelectedEvent">Choose Event</button>
+    }
+}
+else
+{
+    <p>
+        <i>Fetching data from FTC Events...</i>
+    </p>
+}

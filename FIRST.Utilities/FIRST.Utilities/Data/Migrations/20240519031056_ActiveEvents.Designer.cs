@@ -3,6 +3,7 @@ using System;
 using FIRST.Utilities.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FIRST.Utilities.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240519031056_ActiveEvents")]
+    partial class ActiveEvents
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.0");
@@ -87,13 +90,12 @@ namespace FIRST.Utilities.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<int?>("EventId")
+                    b.Property<int>("EventId")
                         .HasColumnType("INTEGER");
 
                     b.HasKey("ActiveEventId");
 
-                    b.HasIndex("EventId")
-                        .IsUnique();
+                    b.HasIndex("EventId");
 
                     b.ToTable("ActiveEvents");
                 });
@@ -260,9 +262,10 @@ namespace FIRST.Utilities.Migrations
             modelBuilder.Entity("FIRST.Utilities.Models.Database.ActiveEvent", b =>
                 {
                     b.HasOne("FIRST.Utilities.Models.Database.Event", "Event")
-                        .WithOne("ActiveEvent")
-                        .HasForeignKey("FIRST.Utilities.Models.Database.ActiveEvent", "EventId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .WithMany()
+                        .HasForeignKey("EventId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Event");
                 });
@@ -316,11 +319,6 @@ namespace FIRST.Utilities.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("FIRST.Utilities.Models.Database.Event", b =>
-                {
-                    b.Navigation("ActiveEvent");
                 });
 #pragma warning restore 612, 618
         }

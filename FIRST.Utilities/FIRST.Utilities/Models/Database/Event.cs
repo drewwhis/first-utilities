@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using Microsoft.EntityFrameworkCore;
 
 namespace FIRST.Utilities.Models.Database;
@@ -11,8 +12,17 @@ namespace FIRST.Utilities.Models.Database;
 public class Event
 {
     public int EventId { get; set; }
+    
+    [StringLength(255)]
     public string? EventName { get; set; }
+    
+    [StringLength(80)]
     public required string EventCode { get; set; }
+    
     public int SeasonYear { get; set; }
+    
+    [StringLength(80)]
     public required string ProgramCode { get; set; }
+    
+    public ActiveEvent? ActiveEvent { get; set; }
 }
