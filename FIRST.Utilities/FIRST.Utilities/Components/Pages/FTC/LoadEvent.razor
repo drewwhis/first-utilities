@@ -30,6 +30,12 @@
         {
             <button class="btn btn-secondary" @onclick="DeselectEvent">De-select Event</button>
         }
+        <br />
+        <br />
+        @if (_teamsLoaded)
+        {
+            <p>Teams are loaded.</p>
+        }
     }
 }
 else

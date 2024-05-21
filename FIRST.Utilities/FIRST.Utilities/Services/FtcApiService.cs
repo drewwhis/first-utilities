@@ -77,4 +77,24 @@ public class FtcApiService(
             .Where(e => e.RegionCode == regionCode)
             .ToList();
     }
+
+    public async Task<IEnumerable<TeamDto>> FetchTeams(string eventCode)
+    {
+        var ftcRecord = programDataService.GetProgram("FTC");
+        if (ftcRecord is null) return [];
+        
+        var client = factory.CreateClient(ApiClientName);
+        var endpoint = string.Format(_ftcApiSettings.TeamsEndpoint, ftcRecord.ActiveSeasonYear, eventCode);
+
+        try
+        {
+            var response = await client.GetFromJsonAsync<TeamsDto>(endpoint);
+            if (response is null) return [];
+            return response.Teams ?? [];
+        }
+        catch
+        {
+            return [];
+        }
+    }
 }

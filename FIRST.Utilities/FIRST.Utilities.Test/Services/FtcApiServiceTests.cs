@@ -42,7 +42,8 @@ public class FtcApiServiceTests
     {
         var ftcApiOptionValues = new FtcApiOptions
         {
-            EventsEndpoint = "{0}/events"
+            EventsEndpoint = "{0}/events",
+            TeamsEndpoint = "{0}/teams?eventCode={1}"
         };
 
         var ftcApiMockOptions = new Mock<IOptions<FtcApiOptions>>();
@@ -220,5 +221,17 @@ public class FtcApiServiceTests
 
         var result = await service.FetchEventList(regionCode, includeOfficial, includeScrimmage, includeOthers);
         Assert.Equal(count, result.Count());
+    }
+    
+    [Fact]
+    public async Task Test_FetchTeams_USALCMP()
+    {
+        var factory = GetMockFactory();
+        var settings = GetProgramDataServiceMock();
+        var apiSettings = GetFtcApiMockOptions();
+        var service = new FtcApiService(apiSettings, settings, factory);
+
+        var results = (await service.FetchTeams("USALCMP")).ToList();
+        Assert.Equal(16, results.Count);
     }
 }

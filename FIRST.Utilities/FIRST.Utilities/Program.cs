@@ -9,6 +9,7 @@ using FIRST.Utilities.Components.Account;
 using FIRST.Utilities.Data;
 using FIRST.Utilities.DataServices;
 using FIRST.Utilities.DataServices.Interfaces;
+using FIRST.Utilities.Models.FtcApi;
 using FIRST.Utilities.Options;
 using FIRST.Utilities.Repositories;
 using FIRST.Utilities.Repositories.Interfaces;
@@ -37,11 +38,13 @@ builder.Services.AddScoped<IFtcApiService, FtcApiService>();
 // Database Services
 builder.Services.AddScoped<IEventDataService, EventDataService>();
 builder.Services.AddScoped<IProgramDataService, ProgramDataService>();
+builder.Services.AddScoped<ITeamDataService, TeamDataService>();
 
 // Repositories
 builder.Services.AddScoped<IProgramRepository, ProgramRepository>();
 builder.Services.AddScoped<IEventRepository, EventRepository>();
 builder.Services.AddScoped<IActiveEventRepository, ActiveEventRepository>();
+builder.Services.AddScoped<ITeamRepository, TeamRepository>();
 
 builder.Services.AddAuthentication(options =>
     {

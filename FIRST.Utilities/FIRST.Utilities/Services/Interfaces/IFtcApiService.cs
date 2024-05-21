@@ -11,4 +11,5 @@ public interface IFtcApiService
     Task<IEnumerable<EventDto>> FetchEventList(string regionCode);
     Task<IEnumerable<EventDto>> FetchEventList(bool includeOfficialEvents, bool includeScrimmages, bool includeOtherEvents);
     Task<IEnumerable<EventDto>> FetchEventList(string regionCode, bool includeOfficialEvents, bool includeScrimmages, bool includeOtherEvents);
+    Task<IEnumerable<TeamDto>> FetchTeams(string eventCode);
 }

@@ -3,6 +3,7 @@ using System;
 using FIRST.Utilities.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FIRST.Utilities.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240521032828_Teams")]
+    partial class Teams
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.0");
@@ -169,10 +172,8 @@ namespace FIRST.Utilities.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("ProgramCode")
-                        .IsRequired()
-                        .HasMaxLength(25)
-                        .HasColumnType("TEXT");
+                    b.Property<int>("ProgramId")
+                        .HasColumnType("INTEGER");
 
                     b.Property<int>("SeasonYear")
                         .HasColumnType("INTEGER");
@@ -186,7 +187,9 @@ namespace FIRST.Utilities.Migrations
 
                     b.HasKey("TeamId");
 
-                    b.HasIndex(new[] { "TeamNumber", "SeasonYear", "ProgramCode" }, "Team_Identification")
+                    b.HasIndex("ProgramId");
+
+                    b.HasIndex(new[] { "TeamNumber", "SeasonYear", "ProgramId" }, "Team_Identification")
                         .IsUnique();
 
                     b.ToTable("Teams");
@@ -328,6 +331,17 @@ namespace FIRST.Utilities.Migrations
                         .OnDelete(DeleteBehavior.Cascade);
 
                     b.Navigation("Event");
+                });
+
+            modelBuilder.Entity("FIRST.Utilities.Models.Database.Team", b =>
+                {
+                    b.HasOne("FIRST.Utilities.Models.Database.Program", "Program")
+                        .WithMany()
+                        .HasForeignKey("ProgramId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Program");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

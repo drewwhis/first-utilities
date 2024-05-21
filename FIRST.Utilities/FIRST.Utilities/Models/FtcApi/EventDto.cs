@@ -1,18 +1,27 @@
 namespace FIRST.Utilities.Models.FtcApi;
 
+// ReSharper disable once ClassNeverInstantiated.Global
 public class EventDto
 {
     public Guid EventId { get; set; }
     public string Code { get; set; } = null!;
     public string? DivisionCode { get; set; }
+
+    // ReSharper disable once UnusedAutoPropertyAccessor.Global
     public string? Name { get; set; }
+
     public bool Remote { get; set; }
     public bool Hybrid { get; set; }
     public bool Published { get; set; }
     public int FieldCount { get; set; }
     public string? Type { get; set; }
+
+    // ReSharper disable once UnusedAutoPropertyAccessor.Global
     public required string TypeName { get; set; }
+
+    // ReSharper disable once UnusedAutoPropertyAccessor.Global
     public string? RegionCode { get; set; }
+
     public string? LeagueCode { get; set; }
     public string? DistrictCode { get; set; }
     public string? Venue { get; set; }

@@ -10,6 +10,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<Event> Events { get; set; }
     public DbSet<ActiveEvent> ActiveEvents { get; set; }
     public DbSet<Models.Database.Program> Programs { get; set; }
+    public DbSet<Team> Teams { get; set; }
     
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -23,6 +24,8 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
         modelBuilder
             .Entity<Models.Database.Program>()
             .HasData(new Models.Database.Program { ProgramId = 1, ProgramCode = "FTC", ActiveSeasonYear = 2023 });
-
+        
+        // TODO: Add Event Teams
+        // TODO: Clear event teams when event is deselected
     }
 }
