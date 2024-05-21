@@ -33,4 +33,9 @@ public class EventDataService(IEventRepository events, IActiveEventRepository ac
         var model = events.Get(programCode, eventCode, seasonYear);
         return await activeEvents.Set(model);
     }
+
+    public async Task<bool> ClearActiveEvent()
+    {
+        return await activeEvents.Set(null);
+    }
 }

@@ -5,11 +5,11 @@
 
 @if (!_isFetching)
 {
-    <button class="btn btn-primary" @onclick="FetchEventCodes">Load Events from FTC</button>
+    <button class="btn btn-primary" @onclick="FetchEventCodes" disabled="@(_activeEvent is not null)">Load Events from FTC</button>
     
     @if (_events.Any())
     {
-        <button class="btn btn-secondary" @onclick="ClearLoadedEvents">Clear Loaded Events</button>
+        <button class="btn btn-secondary" @onclick="ClearLoadedEvents" disabled="@(_activeEvent is not null)">Clear Loaded Events</button>
     }
 
     <br/>
@@ -26,6 +26,10 @@
         <br/>
         <br/>
         <button class="btn btn-primary" @onclick="SaveSelectedEvent" disabled="@(_activeEvent is not null)">Choose Event</button>
+        @if (_activeEvent is not null)
+        {
+            <button class="btn btn-secondary" @onclick="DeselectEvent">De-select Event</button>
+        }
     }
 }
 else

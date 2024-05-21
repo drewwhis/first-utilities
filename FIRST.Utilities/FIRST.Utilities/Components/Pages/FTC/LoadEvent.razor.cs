@@ -90,4 +90,13 @@ public partial class LoadEvent : ComponentBase
         _activeEvent = EventDataService.GetActiveEvent();
         await InvokeAsync(StateHasChanged);
     }
+
+    private async Task DeselectEvent()
+    {
+        if (_activeEvent is null) return;
+        await EventDataService.ClearActiveEvent();
+
+        _activeEvent = EventDataService.GetActiveEvent();
+        await InvokeAsync(StateHasChanged);
+    }
 }

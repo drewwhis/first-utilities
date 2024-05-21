@@ -9,4 +9,5 @@ public interface IEventDataService
     Task<bool> DeleteEvents(string programCode, int seasonYear);
     Event? GetActiveEvent();
     Task<bool> SetActiveEvent(string programCode, string eventCode, int seasonYear);
+    Task<bool> ClearActiveEvent();
 }
