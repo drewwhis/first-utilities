@@ -4,7 +4,7 @@ using FIRST.Utilities.Repositories.Interfaces;
 
 namespace FIRST.Utilities.DataServices;
 
-public class EventDataService(IEventRepository events, IActiveEventRepository activeEvents) : IEventDataService
+public class EventDataService(IEventRepository events, IActiveEventRepository activeEvents, IEventTeamRepository eventTeams) : IEventDataService
 {
     public async Task<bool> UpsertEvent(Event @event)
     {
@@ -30,12 +30,24 @@ public class EventDataService(IEventRepository events, IActiveEventRepository ac
 
     public async Task<bool> SetActiveEvent(string programCode, string eventCode, int seasonYear)
     {
+        var currentActiveEvent = GetActiveEvent();
+        if (currentActiveEvent is not null)
+        {
+            await eventTeams.ClearTeamsFromEvent(currentActiveEvent.EventId);
+        }
+        
         var model = events.Get(programCode, eventCode, seasonYear);
         return await activeEvents.Set(model);
     }
 
     public async Task<bool> ClearActiveEvent()
     {
+        var activeEvent = GetActiveEvent();
+        if (activeEvent is not null)
+        {
+            await eventTeams.ClearTeamsFromEvent(activeEvent.EventId);
+        }
+        
         return await activeEvents.Set(null);
     }
 }

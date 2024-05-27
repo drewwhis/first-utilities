@@ -45,6 +45,7 @@ builder.Services.AddScoped<IProgramRepository, ProgramRepository>();
 builder.Services.AddScoped<IEventRepository, EventRepository>();
 builder.Services.AddScoped<IActiveEventRepository, ActiveEventRepository>();
 builder.Services.AddScoped<ITeamRepository, TeamRepository>();
+builder.Services.AddScoped<IEventTeamRepository, EventTeamRepository>();
 
 builder.Services.AddAuthentication(options =>
     {

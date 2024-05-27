@@ -35,7 +35,7 @@ public partial class LoadEvent : ComponentBase
             .OrderBy(e => e.EventName);
         _activeEvent = EventDataService.GetActiveEvent();
         _selectedEventCode = _activeEvent?.EventCode;
-        _teamsLoaded = TeamDataService.AreTeamsPresent(ftcRecord.ProgramCode, ftcRecord.ActiveSeasonYear);
+        _teamsLoaded = _activeEvent is not null && TeamDataService.AreTeamsPresent(_activeEvent.EventId);
     }
 
     private async Task FetchEventCodes()
@@ -123,11 +123,10 @@ public partial class LoadEvent : ComponentBase
                 SeasonYear = ftcRecord.ActiveSeasonYear,
                 ShortName = team.NameShort,
                 TeamNumber = team.TeamNumber
-
-            });
+            }, _activeEvent);
         }
 
-        _teamsLoaded = TeamDataService.AreTeamsPresent(ftcRecord.ProgramCode, ftcRecord.ActiveSeasonYear);
+        _teamsLoaded = TeamDataService.AreTeamsPresent(_activeEvent.EventId);
         _isFetching = false;
         await InvokeAsync(StateHasChanged);
     }
@@ -136,10 +135,8 @@ public partial class LoadEvent : ComponentBase
     {
         if (_activeEvent is null) return;
         await EventDataService.ClearActiveEvent();
-
-        // TODO: Add event teams
-        // TODO: Clear event teams when deselected
         _activeEvent = EventDataService.GetActiveEvent();
+        _teamsLoaded = _activeEvent is not null && TeamDataService.AreTeamsPresent(_activeEvent.EventId);
         await InvokeAsync(StateHasChanged);
     }
 }

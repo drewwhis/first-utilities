@@ -25,4 +25,6 @@ public class Event
     public required string ProgramCode { get; set; }
     
     public ActiveEvent? ActiveEvent { get; set; }
+    
+    public IList<EventTeam> Teams { get; set; } = new List<EventTeam>();
 }

@@ -24,4 +24,6 @@ public class Team
 
     [StringLength(25)]
     public string ProgramCode { get; set; } = null!;
+
+    public IList<EventTeam> Events { get; set; } = new List<EventTeam>();
 }
