@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
-using FIRST.Utilities.Data;
+using FIRST.Utilities.Entities;
 
 namespace FIRST.Utilities.Components.Account;
 

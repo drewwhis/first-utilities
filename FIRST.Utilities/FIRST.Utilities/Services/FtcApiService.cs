@@ -8,7 +8,7 @@ namespace FIRST.Utilities.Services;
 
 public class FtcApiService(
     IOptions<FtcApiOptions> ftcApiSettings,
-    IProgramDataService programDataService,
+    IActiveProgramSeasonDataService activeProgramSeasonDataService,
     IHttpClientFactory factory)
     : IFtcApiService
 {
@@ -24,11 +24,11 @@ public class FtcApiService(
 
     public async Task<IEnumerable<EventDto>> FetchEventList()
     {
-        var ftcRecord = programDataService.GetProgram("FTC");
+        var ftcRecord = activeProgramSeasonDataService.GetActiveSeason("FTC");
         if (ftcRecord is null) return [];
         
         var client = factory.CreateClient(ApiClientName);
-        var endpoint = string.Format(_ftcApiSettings.EventsEndpoint, ftcRecord.ActiveSeasonYear);
+        var endpoint = string.Format(_ftcApiSettings.EventsEndpoint, ftcRecord.SeasonYear);
 
         try
         {
@@ -80,17 +80,42 @@ public class FtcApiService(
 
     public async Task<IEnumerable<TeamDto>> FetchTeams(string eventCode)
     {
-        var ftcRecord = programDataService.GetProgram("FTC");
+        var ftcRecord = activeProgramSeasonDataService.GetActiveSeason("FTC");
         if (ftcRecord is null) return [];
         
         var client = factory.CreateClient(ApiClientName);
-        var endpoint = string.Format(_ftcApiSettings.TeamsEndpoint, ftcRecord.ActiveSeasonYear, eventCode);
+        var endpoint = string.Format(_ftcApiSettings.TeamsEndpoint, ftcRecord.SeasonYear, eventCode);
 
         try
         {
             var response = await client.GetFromJsonAsync<TeamsDto>(endpoint);
             if (response is null) return [];
             return response.Teams ?? [];
+        }
+        catch
+        {
+            return [];
+        }
+    }
+
+    public async Task<IEnumerable<MatchDto>> FetchMatches(string eventCode, ScheduleType scheduleType)
+    {
+        var ftcRecord = activeProgramSeasonDataService.GetActiveSeason("FTC");
+        if (ftcRecord is null) return [];
+        
+        var client = factory.CreateClient(ApiClientName);
+        var endpoint = string.Format(
+            _ftcApiSettings.ScheduleEndpoint, 
+            ftcRecord.SeasonYear, 
+            eventCode, 
+            scheduleType
+        );
+        
+        try
+        {
+            var response = await client.GetFromJsonAsync<MatchScheduleDto>(endpoint);
+            if (response is null) return [];
+            return response.Schedule ?? [];
         }
         catch
         {

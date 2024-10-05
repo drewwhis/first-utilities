@@ -9,7 +9,7 @@ using FIRST.Utilities.Components.Account;
 using FIRST.Utilities.Data;
 using FIRST.Utilities.DataServices;
 using FIRST.Utilities.DataServices.Interfaces;
-using FIRST.Utilities.Models.FtcApi;
+using FIRST.Utilities.Entities;
 using FIRST.Utilities.Options;
 using FIRST.Utilities.Repositories;
 using FIRST.Utilities.Repositories.Interfaces;
@@ -36,16 +36,17 @@ builder.Services.AddScoped<AuthenticationStateProvider, PersistingRevalidatingAu
 builder.Services.AddScoped<IFtcApiService, FtcApiService>();
 
 // Database Services
-builder.Services.AddScoped<IEventDataService, EventDataService>();
-builder.Services.AddScoped<IProgramDataService, ProgramDataService>();
-builder.Services.AddScoped<ITeamDataService, TeamDataService>();
+builder.Services.AddScoped<IFtcEventDataService, FtcEventDataService>();
+builder.Services.AddScoped<IActiveProgramSeasonDataService, ActiveProgramSeasonDataService>();
+builder.Services.AddScoped<IFtcTeamDataService, FtcTeamDataService>();
+builder.Services.AddScoped<IFtcMatchDataService, FtcMatchDataService>();
 
 // Repositories
-builder.Services.AddScoped<IProgramRepository, ProgramRepository>();
-builder.Services.AddScoped<IEventRepository, EventRepository>();
-builder.Services.AddScoped<IActiveEventRepository, ActiveEventRepository>();
-builder.Services.AddScoped<ITeamRepository, TeamRepository>();
-builder.Services.AddScoped<IEventTeamRepository, EventTeamRepository>();
+builder.Services.AddScoped<IFtcEventRepository, FtcEventRepository>();
+builder.Services.AddScoped<IActiveFtcEventRepository, ActiveFtcEventRepository>();
+builder.Services.AddScoped<IActiveProgramSeasonRepository, ActiveProgramSeasonRepository>();
+builder.Services.AddScoped<IFtcTeamRepository, FtcTeamRepository>();
+builder.Services.AddScoped<IFtcMatchRepository, FtcMatchRepository>();
 
 builder.Services.AddAuthentication(options =>
     {

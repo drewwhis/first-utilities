@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using FIRST.Utilities.Client;
-using FIRST.Utilities.Data;
+using FIRST.Utilities.Entities;
 
 namespace FIRST.Utilities.Components.Account;
 

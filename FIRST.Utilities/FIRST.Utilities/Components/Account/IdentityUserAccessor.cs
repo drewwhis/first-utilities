@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Identity;
-using FIRST.Utilities.Data;
+using FIRST.Utilities.Entities;
 
 namespace FIRST.Utilities.Components.Account;
 
