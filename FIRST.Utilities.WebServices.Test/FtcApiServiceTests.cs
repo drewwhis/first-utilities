@@ -16,7 +16,7 @@ public class FtcApiServiceTests
     private static IHttpClientFactory GetMockFactory()
     {
         var configuration = new ConfigurationBuilder()
-            .AddUserSecrets<FtcApiOptions>()
+            .AddUserSecrets<FtcApiServiceTests>()
             .Build();
 
         var username = configuration.GetValue<string>("FtcApi:Username")!;
@@ -42,6 +42,7 @@ public class FtcApiServiceTests
     {
         var ftcApiOptionValues = new FtcApiOptions
         {
+            BaseUrl = "https://ftc-api.firstinspires.org/v2.0/",
             EventsEndpoint = "{0}/events",
             TeamsEndpoint = "{0}/teams?eventCode={1}",
             ScheduleEndpoint = "{0}/schedule/{1}?tournamentLevel={2}"
