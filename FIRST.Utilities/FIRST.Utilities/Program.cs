@@ -6,15 +6,15 @@ using Microsoft.EntityFrameworkCore;
 using FIRST.Utilities.Client.Pages;
 using FIRST.Utilities.Components;
 using FIRST.Utilities.Components.Account;
+using FIRST.Utilities.Configuration;
 using FIRST.Utilities.Data;
 using FIRST.Utilities.DataServices;
 using FIRST.Utilities.DataServices.Interfaces;
 using FIRST.Utilities.Entities;
-using FIRST.Utilities.Options;
 using FIRST.Utilities.Repositories;
 using FIRST.Utilities.Repositories.Interfaces;
-using FIRST.Utilities.Services;
-using FIRST.Utilities.Services.Interfaces;
+using FIRST.Utilities.WebServices;
+using FIRST.Utilities.WebServices.Interfaces;
 using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);

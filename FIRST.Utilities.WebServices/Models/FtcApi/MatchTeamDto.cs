@@ -1,4 +1,4 @@
-namespace FIRST.Utilities.Models.FtcApi;
+namespace FIRST.Utilities.WebServices.Models.FtcApi;
 
 public class MatchTeamDto
 {

@@ -1,6 +1,6 @@
-using FIRST.Utilities.Models.FtcApi;
+using FIRST.Utilities.WebServices.Models.FtcApi;
 
-namespace FIRST.Utilities.Services.Interfaces;
+namespace FIRST.Utilities.WebServices.Interfaces;
 
 public interface IFtcApiService
 {

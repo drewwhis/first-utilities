@@ -1,4 +1,4 @@
-namespace FIRST.Utilities.Options;
+namespace FIRST.Utilities.Configuration;
 
 public class FtcApiOptions
 {

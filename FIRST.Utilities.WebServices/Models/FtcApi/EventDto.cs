@@ -1,4 +1,4 @@
-namespace FIRST.Utilities.Models.FtcApi;
+namespace FIRST.Utilities.WebServices.Models.FtcApi;
 
 // ReSharper disable once ClassNeverInstantiated.Global
 public class EventDto

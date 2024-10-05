@@ -1,10 +1,11 @@
+using System.Net.Http.Json;
+using FIRST.Utilities.Configuration;
 using FIRST.Utilities.DataServices.Interfaces;
-using FIRST.Utilities.Models.FtcApi;
-using FIRST.Utilities.Options;
-using FIRST.Utilities.Services.Interfaces;
+using FIRST.Utilities.WebServices.Interfaces;
+using FIRST.Utilities.WebServices.Models.FtcApi;
 using Microsoft.Extensions.Options;
 
-namespace FIRST.Utilities.Services;
+namespace FIRST.Utilities.WebServices;
 
 public class FtcApiService(
     IOptions<FtcApiOptions> ftcApiSettings,
