@@ -36,12 +36,23 @@
         {
             <p>Teams are loaded.</p>
             <button class="btn btn-primary" @onclick="LoadQualificationMatches" disabled="@_qualificationMatchesLoaded">Load Qualification Matches</button>
+            <button class="btn btn-primary" @onclick="LoadPlayoffMatches" disabled="@_playoffMatchesLoaded">Load Playoff Matches</button>
             <br />
             <br />
             @if (_qualificationMatchesLoaded)
             {
                 <p>Qualification Matches are loaded.</p>
                 <button class="btn btn-secondary" @onclick="ClearQualificationMatches">Clear Qualification Matches</button>
+                <br />
+                <br />
+            }
+            
+            @if (_playoffMatchesLoaded)
+            {
+                <p>Playoff Matches are loaded.</p>
+                <button class="btn btn-secondary" @onclick="ClearPlayoffMatches">Clear Playoff Matches</button>
+                <br/>
+                <br/>
             }
         }
     }

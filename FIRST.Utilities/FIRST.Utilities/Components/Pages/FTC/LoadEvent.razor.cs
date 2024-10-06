@@ -12,6 +12,7 @@ public partial class LoadEvent : ComponentBase
     private FtcEvent? _activeEvent;
     private bool _teamsLoaded;
     private bool _qualificationMatchesLoaded;
+    private bool _playoffMatchesLoaded;
     private IEnumerable<FtcEvent> _events = [];
     
     [Inject] private IFtcApiService FtcApiService { get; set; } = null!;
@@ -30,6 +31,7 @@ public partial class LoadEvent : ComponentBase
             _selectedEventCode = null;
             _teamsLoaded = false;
             _qualificationMatchesLoaded = false;
+            _playoffMatchesLoaded = false;
             return;
         }
         
@@ -42,6 +44,7 @@ public partial class LoadEvent : ComponentBase
         if (_activeEvent is null) return;
         _teamsLoaded = FtcTeamDataService.AreTeamsPresent();
         _qualificationMatchesLoaded = FtcMatchDataService.AreQualificationMatchesPresent();
+        _playoffMatchesLoaded = FtcMatchDataService.ArePlayoffMatchesPresent();
     }
 
     private async Task FetchEventCodes()
@@ -136,6 +139,7 @@ public partial class LoadEvent : ComponentBase
 
         _teamsLoaded = FtcTeamDataService.AreTeamsPresent();
         _qualificationMatchesLoaded = FtcMatchDataService.AreQualificationMatchesPresent();
+        _playoffMatchesLoaded = FtcMatchDataService.ArePlayoffMatchesPresent();
         
         _isFetching = false;
         await InvokeAsync(StateHasChanged);
@@ -151,6 +155,9 @@ public partial class LoadEvent : ComponentBase
 
         await FtcMatchDataService.ClearQualificationMatches();
         _qualificationMatchesLoaded = FtcMatchDataService.AreQualificationMatchesPresent();
+
+        await FtcMatchDataService.ClearPlayoffMatches();
+        _playoffMatchesLoaded = FtcMatchDataService.ArePlayoffMatchesPresent();
         
         await InvokeAsync(StateHasChanged);
     }
@@ -207,6 +214,70 @@ public partial class LoadEvent : ComponentBase
     {
         await FtcMatchDataService.ClearQualificationMatches();
         _qualificationMatchesLoaded = FtcMatchDataService.AreQualificationMatchesPresent();
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private async Task LoadPlayoffMatches()
+    {
+        _isFetching = true;
+        await InvokeAsync(StateHasChanged);
+        
+        if (_activeEvent is null || !_teamsLoaded)
+        {
+            _isFetching = false;
+            await InvokeAsync(StateHasChanged);
+            return;
+        }
+
+        var matches = await FtcApiService.FetchMatches(_activeEvent.EventCode, WebServices.Models.FtcApi.ScheduleType.playoff);
+        foreach (var match in matches)
+        {
+            var matchTeams = match.Teams?
+                .Where(t => t.Station != null)
+                .Select(t => new
+                {
+                    Alliance = t.Station!.StartsWith("Red") ? Alliance.RED : Alliance.BLUE,
+                    Station = t.Station!.EndsWith('1') ? 1 : 2,
+                    Number = t.TeamNumber
+                })
+                .ToList() ?? [];
+            
+            var teamDictionary = matchTeams
+                .ToDictionary(
+                    t => (t.Alliance, t.Station), 
+                    t => t.Number
+                );
+
+            ScheduleType? tournamentLevel = match.TournamentLevel switch
+            {
+                "FINAL" => ScheduleType.FINAL,
+                "SEMIFINAL" => ScheduleType.SEMIFINAL,
+                _ => null
+            };
+
+            if (tournamentLevel is null) continue;
+
+            var newMatch = new FtcMatch
+            {
+                MatchNumber = match.MatchNumber,
+                Field = match.Field,
+                StartTime = match.StartTime,
+                Series = match.Series,
+                TournamentLevel = tournamentLevel.Value
+            };
+            
+            await FtcMatchDataService.CreateMatch(newMatch, teamDictionary);
+        }
+
+        _playoffMatchesLoaded = FtcMatchDataService.ArePlayoffMatchesPresent();
+        _isFetching = false;
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private async Task ClearPlayoffMatches()
+    {
+        await FtcMatchDataService.ClearPlayoffMatches();
+        _playoffMatchesLoaded = FtcMatchDataService.ArePlayoffMatchesPresent();
         await InvokeAsync(StateHasChanged);
     }
 }

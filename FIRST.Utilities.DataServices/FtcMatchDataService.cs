@@ -11,7 +11,12 @@ public class FtcMatchDataService(
 {
     public bool AreQualificationMatchesPresent()
     {
-        return ftcMatches.GetAll().Any(m => m.TournamentLevel == ScheduleType.QUALIFICATION);
+        return ftcMatches.GetAll().Any(m => m.TournamentLevel is ScheduleType.QUALIFICATION);
+    }
+
+    public bool ArePlayoffMatchesPresent()
+    {
+        return ftcMatches.GetAll().Any(m => m.TournamentLevel is ScheduleType.FINAL or ScheduleType.SEMIFINAL);
     }
 
     public async Task<bool> CreateMatch(FtcMatch match, Dictionary<(Alliance, int), int> teams)
@@ -43,16 +48,31 @@ public class FtcMatchDataService(
 
     public async Task<bool> ClearQualificationMatches()
     {
-        var qualificiationIds = ftcMatches
+        var qualificationIds = ftcMatches
             .GetAll()
-            .Where(m => m.TournamentLevel == ScheduleType.QUALIFICATION)
+            .Where(m => m.TournamentLevel is ScheduleType.QUALIFICATION)
             .Select(m => m.FtcMatchId)
             .ToHashSet();
         
-        var participantSuccess = await ftcMatchParticipants.ClearMatchParticipants(qualificiationIds);
+        var participantSuccess = await ftcMatchParticipants.ClearMatchParticipants(qualificationIds);
         if (!participantSuccess) return false;
 
         var matchSuccess = await ftcMatches.ClearQualificationMatches();
+        return matchSuccess;
+    }
+
+    public async Task<bool> ClearPlayoffMatches()
+    {
+        var playoffIds = ftcMatches
+            .GetAll()
+            .Where(m => m.TournamentLevel is ScheduleType.SEMIFINAL or ScheduleType.FINAL)
+            .Select(m => m.FtcMatchId)
+            .ToHashSet();
+        
+        var participantSuccess = await ftcMatchParticipants.ClearMatchParticipants(playoffIds);
+        if (!participantSuccess) return false;
+
+        var matchSuccess = await ftcMatches.ClearPlayoffMatches();
         return matchSuccess;
     }
 }

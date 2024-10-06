@@ -11,10 +11,11 @@ public class FtcMatchRepository(ApplicationDbContext context) : IFtcMatchReposit
         return context.FtcMatches.ToList();
     }
 
-    public FtcMatch? Get(int matchNumber, ScheduleType tournamentLevel)
+    public FtcMatch? Get(int matchNumber, int series, ScheduleType tournamentLevel)
     {
         return context.FtcMatches.FirstOrDefault(m =>
             m.MatchNumber == matchNumber
+            && m.Series == series
             && m.TournamentLevel == tournamentLevel);
     }
 
@@ -64,4 +65,22 @@ public class FtcMatchRepository(ApplicationDbContext context) : IFtcMatchReposit
             return false;
         }
     }
+
+    public async Task<bool> ClearPlayoffMatches()
+    {
+        var entries = context.FtcMatches
+            .Where(m => m.TournamentLevel == ScheduleType.FINAL || m.TournamentLevel == ScheduleType.SEMIFINAL)
+            .ToList();
+        
+        if (entries.Count == 0) return true;
+
+        try
+        {
+            context.FtcMatches.RemoveRange(entries);
+            return await context.SaveChangesAsync() == entries.Count;
+        }
+        catch
+        {
+            return false;
+        }    }
 }
