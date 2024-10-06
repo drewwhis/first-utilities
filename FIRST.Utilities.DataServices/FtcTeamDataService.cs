@@ -22,6 +22,11 @@ public class FtcTeamDataService(IFtcTeamRepository teams) : IFtcTeamDataService
         return GetAll().Any();
     }
 
+    public async Task<bool> ClearTeams()
+    {
+        return await teams.ClearTeams();
+    }
+
     public IEnumerable<FtcTeam> GetAll()
     {
         return teams.GetAll();

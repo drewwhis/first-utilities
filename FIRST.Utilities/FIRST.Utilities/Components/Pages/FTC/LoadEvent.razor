@@ -28,13 +28,21 @@
         <button class="btn btn-primary" @onclick="SaveSelectedEvent" disabled="@(_activeEvent is not null)">Choose Event</button>
         @if (_activeEvent is not null)
         {
-            <button class="btn btn-secondary" @onclick="DeselectEvent">De-select Event</button>
+            <button class="btn btn-secondary" @onclick="DeselectEvent" disabled="@_qualificationMatchesLoaded">De-select Event</button>
         }
         <br />
         <br />
         @if (_teamsLoaded)
         {
             <p>Teams are loaded.</p>
+            <button class="btn btn-primary" @onclick="LoadQualificationMatches" disabled="@_qualificationMatchesLoaded">Load Qualification Matches</button>
+            <br />
+            <br />
+            @if (_qualificationMatchesLoaded)
+            {
+                <p>Qualification Matches are loaded.</p>
+                <button class="btn btn-secondary" @onclick="ClearQualificationMatches">Clear Qualification Matches</button>
+            }
         }
     }
 }

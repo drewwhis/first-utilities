@@ -6,5 +6,5 @@ public interface IFtcTeamDataService
 {
     Task<bool> UpsertTeam(FtcTeam ftcTeam);
     bool AreTeamsPresent();
-    IEnumerable<FtcTeam> GetAll();
+    Task<bool> ClearTeams();
 }

@@ -1,6 +1,6 @@
 using FIRST.Utilities.DataServices.Interfaces;
-using FIRST.Utilities.Models.Database;
-using FIRST.Utilities.Services.Interfaces;
+using FIRST.Utilities.Entities;
+using FIRST.Utilities.WebServices.Interfaces;
 using Microsoft.AspNetCore.Components;
 
 namespace FIRST.Utilities.Components.Pages.FTC;
@@ -9,38 +9,44 @@ public partial class LoadEvent : ComponentBase
 {
     private bool _isFetching;
     private string? _selectedEventCode;
-    private Event? _activeEvent;
+    private FtcEvent? _activeEvent;
     private bool _teamsLoaded;
-    private IEnumerable<Event> _events = [];
+    private bool _qualificationMatchesLoaded;
+    private IEnumerable<FtcEvent> _events = [];
     
     [Inject] private IFtcApiService FtcApiService { get; set; } = null!;
-    [Inject] private IEventDataService EventDataService { get; set; } = null!;
-    [Inject] private IProgramDataService ProgramDataService { get; set; } = null!;
-    [Inject] private ITeamDataService TeamDataService { get; set; } = null!;
+    [Inject] private IFtcEventDataService FtcEventDataService { get; set; } = null!;
+    [Inject] private IActiveProgramSeasonDataService ActiveProgramSeasonDataService { get; set; } = null!;
+    [Inject] private IFtcTeamDataService FtcTeamDataService { get; set; } = null!;
+    [Inject] private IFtcMatchDataService FtcMatchDataService { get; set; } = null!;
 
     protected override void OnInitialized()
     {
-        var ftcRecord = ProgramDataService.GetProgram("FTC");
+        var ftcRecord = ActiveProgramSeasonDataService.GetActiveSeason("FTC");
         if (ftcRecord is null)
         {
             _events = [];
             _activeEvent = null;
             _selectedEventCode = null;
             _teamsLoaded = false;
+            _qualificationMatchesLoaded = false;
             return;
         }
         
-        _events = EventDataService
-            .GetEvents(ftcRecord.ProgramCode, ftcRecord.ActiveSeasonYear)
+        _events = FtcEventDataService
+            .GetEvents(ftcRecord.SeasonYear)
             .OrderBy(e => e.EventName);
-        _activeEvent = EventDataService.GetActiveEvent();
+        _activeEvent = FtcEventDataService.GetActiveEvent();
         _selectedEventCode = _activeEvent?.EventCode;
-        _teamsLoaded = _activeEvent is not null && TeamDataService.AreTeamsPresent(_activeEvent.EventId);
+
+        if (_activeEvent is null) return;
+        _teamsLoaded = FtcTeamDataService.AreTeamsPresent();
+        _qualificationMatchesLoaded = FtcMatchDataService.AreQualificationMatchesPresent();
     }
 
     private async Task FetchEventCodes()
     {
-        var ftcRecord = ProgramDataService.GetProgram("FTC");
+        var ftcRecord = ActiveProgramSeasonDataService.GetActiveSeason("FTC");
         if (ftcRecord is null) return;
 
         _isFetching = true;
@@ -52,17 +58,16 @@ public partial class LoadEvent : ComponentBase
         );
         foreach (var @event in fetchedEvents)
         {
-            await EventDataService.UpsertEvent(new Event
+            await FtcEventDataService.UpsertEvent(new FtcEvent
             {
                 EventCode = @event.Code,
                 EventName = @event.Name,
-                ProgramCode = ftcRecord.ProgramCode,
-                SeasonYear = ftcRecord.ActiveSeasonYear
+                SeasonYear = ftcRecord.SeasonYear
             });
         }
         
-        _events = EventDataService
-            .GetEvents(ftcRecord.ProgramCode, ftcRecord.ActiveSeasonYear)
+        _events = FtcEventDataService
+            .GetEvents(ftcRecord.SeasonYear)
             .OrderBy(e => e.EventName);
         _isFetching = false;
         await InvokeAsync(StateHasChanged);
@@ -70,15 +75,19 @@ public partial class LoadEvent : ComponentBase
     
     private async Task ClearLoadedEvents()
     {
-        var ftcRecord = ProgramDataService.GetProgram("FTC");
+        var ftcRecord = ActiveProgramSeasonDataService.GetActiveSeason("FTC");
         if (ftcRecord is null) return;
         
         _isFetching = true;
         await InvokeAsync(StateHasChanged);
 
-        await EventDataService.DeleteEvents(ftcRecord.ProgramCode, ftcRecord.ActiveSeasonYear);
-        _events = EventDataService.GetEvents(ftcRecord.ProgramCode, ftcRecord.ActiveSeasonYear);
-        _activeEvent = EventDataService.GetActiveEvent();
+        await FtcEventDataService.DeleteEvents(ftcRecord.SeasonYear);
+        _events = FtcEventDataService.GetEvents(ftcRecord.SeasonYear);
+        _activeEvent = FtcEventDataService.GetActiveEvent();
+
+        await FtcTeamDataService.ClearTeams();
+        await FtcMatchDataService.ClearQualificationMatches();
+        
         _selectedEventCode = _activeEvent?.EventCode;
         _isFetching = false;
         await InvokeAsync(StateHasChanged);
@@ -96,7 +105,7 @@ public partial class LoadEvent : ComponentBase
             return;
         }
         
-        var ftcRecord = ProgramDataService.GetProgram("FTC");
+        var ftcRecord = ActiveProgramSeasonDataService.GetActiveSeason("FTC");
         if (ftcRecord is null)
         {
             _isFetching = false;
@@ -104,8 +113,8 @@ public partial class LoadEvent : ComponentBase
             return;
         }
         
-        await EventDataService.SetActiveEvent(ftcRecord.ProgramCode, _selectedEventCode, ftcRecord.ActiveSeasonYear);
-        _activeEvent = EventDataService.GetActiveEvent();
+        await FtcEventDataService.SetActiveEvent(_selectedEventCode, ftcRecord.SeasonYear);
+        _activeEvent = FtcEventDataService.GetActiveEvent();
         if (_activeEvent is null)
         {
             _isFetching = false;
@@ -116,27 +125,88 @@ public partial class LoadEvent : ComponentBase
         var teams = await FtcApiService.FetchTeams(_activeEvent.EventCode);
         foreach (var team in teams)
         {
-            await TeamDataService.UpsertTeam(new Team
+            await FtcTeamDataService.UpsertTeam(new FtcTeam
             {
                 FullName = team.NameFull,
-                ProgramCode = ftcRecord.ProgramCode,
-                SeasonYear = ftcRecord.ActiveSeasonYear,
+                SeasonYear = ftcRecord.SeasonYear,
                 ShortName = team.NameShort,
                 TeamNumber = team.TeamNumber
-            }, _activeEvent);
+            });
         }
 
-        _teamsLoaded = TeamDataService.AreTeamsPresent(_activeEvent.EventId);
+        _teamsLoaded = FtcTeamDataService.AreTeamsPresent();
+        _qualificationMatchesLoaded = FtcMatchDataService.AreQualificationMatchesPresent();
+        
         _isFetching = false;
         await InvokeAsync(StateHasChanged);
     }
 
     private async Task DeselectEvent()
     {
-        if (_activeEvent is null) return;
-        await EventDataService.ClearActiveEvent();
-        _activeEvent = EventDataService.GetActiveEvent();
-        _teamsLoaded = _activeEvent is not null && TeamDataService.AreTeamsPresent(_activeEvent.EventId);
+        await FtcEventDataService.ClearActiveEvent();
+        _activeEvent = FtcEventDataService.GetActiveEvent();
+
+        await FtcTeamDataService.ClearTeams();
+        _teamsLoaded = FtcTeamDataService.AreTeamsPresent();
+
+        await FtcMatchDataService.ClearQualificationMatches();
+        _qualificationMatchesLoaded = FtcMatchDataService.AreQualificationMatchesPresent();
+        
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private async Task LoadQualificationMatches()
+    {
+        _isFetching = true;
+        await InvokeAsync(StateHasChanged);
+        
+        if (_activeEvent is null || !_teamsLoaded)
+        {
+            _isFetching = false;
+            await InvokeAsync(StateHasChanged);
+            return;
+        }
+
+        var matches = await FtcApiService.FetchMatches(_activeEvent.EventCode, WebServices.Models.FtcApi.ScheduleType.qual);
+        foreach (var match in matches)
+        {
+            var matchTeams = match.Teams?
+                .Where(t => t.Station != null)
+                .Select(t => new
+                {
+                    Alliance = t.Station!.StartsWith("Red") ? Alliance.RED : Alliance.BLUE,
+                    Station = t.Station!.EndsWith('1') ? 1 : 2,
+                    Number = t.TeamNumber
+                })
+                .ToList() ?? [];
+            
+            var teamDictionary = matchTeams
+                .ToDictionary(
+                    t => (t.Alliance, t.Station), 
+                    t => t.Number
+            );
+
+            var newMatch = new FtcMatch
+            {
+                MatchNumber = match.MatchNumber,
+                Field = match.Field,
+                StartTime = match.StartTime,
+                Series = match.Series,
+                TournamentLevel = ScheduleType.QUALIFICATION
+            };
+            
+            await FtcMatchDataService.CreateMatch(newMatch, teamDictionary);
+        }
+
+        _qualificationMatchesLoaded = FtcMatchDataService.AreQualificationMatchesPresent();
+        _isFetching = false;
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private async Task ClearQualificationMatches()
+    {
+        await FtcMatchDataService.ClearQualificationMatches();
+        _qualificationMatchesLoaded = FtcMatchDataService.AreQualificationMatchesPresent();
         await InvokeAsync(StateHasChanged);
     }
 }
