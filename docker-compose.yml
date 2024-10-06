@@ -3,10 +3,10 @@
     image: first.utilities.client
     build:
       context: .
-      dockerfile: FIRST.Utilities/FIRST.Utilities.Client/Dockerfile
+      dockerfile: FIRST.Utilities.Client/Dockerfile
 
   first.utilities:
     image: first.utilities
     build:
       context: .
-      dockerfile: FIRST.Utilities/FIRST.Utilities/Dockerfile
+      dockerfile: FIRST.Utilities/Dockerfile

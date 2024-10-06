@@ -17,15 +17,15 @@
     </ItemGroup>
     
     <ItemGroup>
-        <ProjectReference Include="..\..\FIRST.Utilities.Client\FIRST.Utilities.Client.csproj" />
-        <ProjectReference Include="..\..\FIRST.Utilities.Configuration\FIRST.Utilities.Configuration.csproj" />
-        <ProjectReference Include="..\..\FIRST.Utilities.DataServices\FIRST.Utilities.DataServices.csproj" />
-        <ProjectReference Include="..\..\FIRST.Utilities.Entities\FIRST.Utilities.Entities.csproj" />
-        <ProjectReference Include="..\..\FIRST.Utilities.WebServices\FIRST.Utilities.WebServices.csproj" />
+        <ProjectReference Include="..\FIRST.Utilities.Client\FIRST.Utilities.Client.csproj" />
+        <ProjectReference Include="..\FIRST.Utilities.Configuration\FIRST.Utilities.Configuration.csproj" />
+        <ProjectReference Include="..\FIRST.Utilities.DataServices\FIRST.Utilities.DataServices.csproj" />
+        <ProjectReference Include="..\FIRST.Utilities.Entities\FIRST.Utilities.Entities.csproj" />
+        <ProjectReference Include="..\FIRST.Utilities.WebServices\FIRST.Utilities.WebServices.csproj" />
     </ItemGroup>
 
     <ItemGroup>
-      <Content Include="..\..\.dockerignore">
+      <Content Include="..\.dockerignore">
         <Link>.dockerignore</Link>
       </Content>
       <Content Remove="Data\**" />
