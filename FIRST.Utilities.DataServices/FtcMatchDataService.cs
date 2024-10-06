@@ -9,6 +9,11 @@ public class FtcMatchDataService(
     IFtcMatchParticipantRepository ftcMatchParticipants,
     IFtcTeamRepository ftcTeams) : IFtcMatchDataService
 {
+    public IEnumerable<FtcMatch> GetByScheduleType(ScheduleType scheduleType)
+    {
+        return ftcMatches.GetByScheduleType(scheduleType, true);
+    }
+
     public bool AreQualificationMatchesPresent()
     {
         return ftcMatches.GetAll().Any(m => m.TournamentLevel is ScheduleType.QUALIFICATION);

@@ -1,6 +1,7 @@
 using FIRST.Utilities.Data;
 using FIRST.Utilities.Entities;
 using FIRST.Utilities.Repositories.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace FIRST.Utilities.Repositories;
 
@@ -9,6 +10,15 @@ public class FtcMatchRepository(ApplicationDbContext context) : IFtcMatchReposit
     public IEnumerable<FtcMatch> GetAll()
     {
         return context.FtcMatches.ToList();
+    }
+
+    public IEnumerable<FtcMatch> GetByScheduleType(ScheduleType scheduleType, bool loadTeams)
+    {
+        return context.FtcMatches
+            .Where(m => m.TournamentLevel == scheduleType)
+            .Include(m => m.FtcMatchParticipants)
+            .ThenInclude(p => p.FtcTeam)
+            .ToList();
     }
 
     public FtcMatch? Get(int matchNumber, int series, ScheduleType tournamentLevel)
