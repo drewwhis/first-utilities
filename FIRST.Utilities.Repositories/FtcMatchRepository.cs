@@ -8,8 +8,7 @@ public class FtcMatchRepository(ApplicationDbContext context) : IFtcMatchReposit
 {
     public IEnumerable<FtcMatch> GetAll()
     {
-        return context.FtcMatches
-            .ToList();
+        return context.FtcMatches.ToList();
     }
 
     public FtcMatch? Get(int matchNumber, ScheduleType tournamentLevel)
@@ -32,12 +31,33 @@ public class FtcMatchRepository(ApplicationDbContext context) : IFtcMatchReposit
         }
     }
 
-    public async Task<bool> Create(FtcMatch ftcMatch)
+    public async Task<FtcMatch?> Create(FtcMatch ftcMatch)
     {
         try
         {
             await context.FtcMatches.AddAsync(ftcMatch);
-            return await context.SaveChangesAsync() == 1;
+            if (await context.SaveChangesAsync() != 1) return null;
+            await context.Entry(ftcMatch).ReloadAsync();
+            return ftcMatch;
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
+    public async Task<bool> ClearQualificationMatches()
+    {
+        var entries = context.FtcMatches
+            .Where(m => m.TournamentLevel == ScheduleType.QUALIFICATION)
+            .ToList();
+        
+        if (entries.Count == 0) return true;
+
+        try
+        {
+            context.FtcMatches.RemoveRange(entries);
+            return await context.SaveChangesAsync() == entries.Count;
         }
         catch
         {

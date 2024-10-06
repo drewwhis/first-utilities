@@ -47,6 +47,7 @@ builder.Services.AddScoped<IActiveFtcEventRepository, ActiveFtcEventRepository>(
 builder.Services.AddScoped<IActiveProgramSeasonRepository, ActiveProgramSeasonRepository>();
 builder.Services.AddScoped<IFtcTeamRepository, FtcTeamRepository>();
 builder.Services.AddScoped<IFtcMatchRepository, FtcMatchRepository>();
+builder.Services.AddScoped<IFtcMatchParticipantRepository, FtcMatchParticipantRepository>();
 
 builder.Services.AddAuthentication(options =>
     {

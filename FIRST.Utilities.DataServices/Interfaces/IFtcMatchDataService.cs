@@ -5,5 +5,6 @@ namespace FIRST.Utilities.DataServices.Interfaces;
 public interface IFtcMatchDataService
 {
     bool AreQualificationMatchesPresent();
-    Task<bool> UpsertMatch(FtcMatch ftcMatch);
+    Task<bool> CreateMatch(FtcMatch match, Dictionary<(Alliance, int), int> teams);
+    Task<bool> ClearQualificationMatches();
 }
