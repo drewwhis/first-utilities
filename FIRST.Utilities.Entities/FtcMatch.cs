@@ -5,8 +5,9 @@ namespace FIRST.Utilities.Entities;
 [Index(
     nameof(MatchNumber), 
     nameof(TournamentLevel),
+    nameof(Series),
     IsUnique = true, 
-    Name = "Match_Identification")]
+    Name = "IX_MatchNumber_TournamentLevel_Series")]
 public class FtcMatch
 {
     public int FtcMatchId { get; set; }
