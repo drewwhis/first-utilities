@@ -11,6 +11,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<ActiveFtcEvent> ActiveFtcEvents { get; set; }
     public DbSet<FtcTeam> FtcTeams { get; set; }
     public DbSet<FtcMatch> FtcMatches { get; set; }
+    public DbSet<FtcMatchParticipant> FtcMatchParticipants { get; set; }
     public DbSet<ActiveProgramSeason> ActiveProgramSeasons { get; set; }
     
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -21,29 +22,5 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
             .HasOne(e => e.ActiveEvent)
             .WithOne(a => a.Event)
             .OnDelete(DeleteBehavior.Cascade);
-
-        // modelBuilder
-        //     .Entity<FtcTeam>()
-        //     .HasMany(t => t.Matches)
-        //     .WithOne(m => m.Blue1Team)
-        //     .OnDelete(DeleteBehavior.Cascade);
-        //
-        // modelBuilder
-        //     .Entity<FtcTeam>()
-        //     .HasMany(t => t.Matches)
-        //     .WithOne(m => m.Blue2Team)
-        //     .OnDelete(DeleteBehavior.Cascade);
-        //
-        // modelBuilder
-        //     .Entity<FtcTeam>()
-        //     .HasMany(t => t.Matches)
-        //     .WithOne(m => m.Red1Team)
-        //     .OnDelete(DeleteBehavior.Cascade);
-        //
-        // modelBuilder
-        //     .Entity<FtcTeam>()
-        //     .HasMany(t => t.Matches)
-        //     .WithOne(m => m.Red2Team)
-        //     .OnDelete(DeleteBehavior.Cascade);
     }
 }

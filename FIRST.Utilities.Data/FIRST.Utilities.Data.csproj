@@ -15,4 +15,8 @@
       <ProjectReference Include="..\FIRST.Utilities.Entities\FIRST.Utilities.Entities.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Migrations\" />
+    </ItemGroup>
+
 </Project>

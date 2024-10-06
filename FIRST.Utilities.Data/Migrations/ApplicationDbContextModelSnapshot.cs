@@ -149,9 +149,6 @@ namespace FIRST.Utilities.Data.Migrations
                     b.Property<string>("Field")
                         .HasColumnType("TEXT");
 
-                    b.Property<int?>("FtcTeamId")
-                        .HasColumnType("INTEGER");
-
                     b.Property<int>("MatchNumber")
                         .HasColumnType("INTEGER");
 
@@ -166,12 +163,41 @@ namespace FIRST.Utilities.Data.Migrations
 
                     b.HasKey("FtcMatchId");
 
-                    b.HasIndex("FtcTeamId");
-
                     b.HasIndex(new[] { "MatchNumber", "TournamentLevel" }, "Match_Identification")
                         .IsUnique();
 
                     b.ToTable("FtcMatches");
+                });
+
+            modelBuilder.Entity("FIRST.Utilities.Entities.FtcMatchParticipant", b =>
+                {
+                    b.Property<int>("FtcMatchParticipantId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("Alliance")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("FtcMatchId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("FtcTeamId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("Station")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("FtcMatchParticipantId");
+
+                    b.HasIndex("FtcTeamId");
+
+                    b.HasIndex(new[] { "FtcMatchId", "Alliance", "Station" }, "IX_Match_Alliance_Station")
+                        .IsUnique();
+
+                    b.HasIndex(new[] { "FtcMatchId", "FtcTeamId" }, "IX_Match_Team")
+                        .IsUnique();
+
+                    b.ToTable("FtcMatchParticipants");
                 });
 
             modelBuilder.Entity("FIRST.Utilities.Entities.FtcTeam", b =>
@@ -341,11 +367,23 @@ namespace FIRST.Utilities.Data.Migrations
                     b.Navigation("Event");
                 });
 
-            modelBuilder.Entity("FIRST.Utilities.Entities.FtcMatch", b =>
+            modelBuilder.Entity("FIRST.Utilities.Entities.FtcMatchParticipant", b =>
                 {
-                    b.HasOne("FIRST.Utilities.Entities.FtcTeam", null)
-                        .WithMany("Matches")
-                        .HasForeignKey("FtcTeamId");
+                    b.HasOne("FIRST.Utilities.Entities.FtcMatch", "FtcMatch")
+                        .WithMany("FtcMatchParticipants")
+                        .HasForeignKey("FtcMatchId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("FIRST.Utilities.Entities.FtcTeam", "FtcTeam")
+                        .WithMany("FtcMatchParticipants")
+                        .HasForeignKey("FtcTeamId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("FtcMatch");
+
+                    b.Navigation("FtcTeam");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -404,9 +442,14 @@ namespace FIRST.Utilities.Data.Migrations
                     b.Navigation("ActiveEvent");
                 });
 
+            modelBuilder.Entity("FIRST.Utilities.Entities.FtcMatch", b =>
+                {
+                    b.Navigation("FtcMatchParticipants");
+                });
+
             modelBuilder.Entity("FIRST.Utilities.Entities.FtcTeam", b =>
                 {
-                    b.Navigation("Matches");
+                    b.Navigation("FtcMatchParticipants");
                 });
 #pragma warning restore 612, 618
         }

@@ -6,11 +6,25 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace FIRST.Utilities.Data.Migrations
 {
     /// <inheritdoc />
-    public partial class CreateIdentitySchema : Migration
+    public partial class InitialMigration : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.CreateTable(
+                name: "ActiveProgramSeasons",
+                columns: table => new
+                {
+                    ActiveProgramSeasonId = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    ProgramCode = table.Column<string>(type: "TEXT", maxLength: 10, nullable: false),
+                    SeasonYear = table.Column<int>(type: "INTEGER", maxLength: 80, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ActiveProgramSeasons", x => x.ActiveProgramSeasonId);
+                });
+
             migrationBuilder.CreateTable(
                 name: "AspNetRoles",
                 columns: table => new
@@ -20,7 +34,10 @@ namespace FIRST.Utilities.Data.Migrations
                     NormalizedName = table.Column<string>(type: "TEXT", maxLength: 256, nullable: true),
                     ConcurrencyStamp = table.Column<string>(type: "TEXT", nullable: true)
                 },
-                constraints: table => { table.PrimaryKey("PK_AspNetRoles", x => x.Id); });
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AspNetRoles", x => x.Id);
+                });
 
             migrationBuilder.CreateTable(
                 name: "AspNetUsers",
@@ -42,7 +59,58 @@ namespace FIRST.Utilities.Data.Migrations
                     LockoutEnabled = table.Column<bool>(type: "INTEGER", nullable: false),
                     AccessFailedCount = table.Column<int>(type: "INTEGER", nullable: false)
                 },
-                constraints: table => { table.PrimaryKey("PK_AspNetUsers", x => x.Id); });
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AspNetUsers", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "FtcEvents",
+                columns: table => new
+                {
+                    FtcEventId = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    EventName = table.Column<string>(type: "TEXT", maxLength: 255, nullable: true),
+                    EventCode = table.Column<string>(type: "TEXT", maxLength: 80, nullable: false),
+                    SeasonYear = table.Column<int>(type: "INTEGER", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_FtcEvents", x => x.FtcEventId);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "FtcMatches",
+                columns: table => new
+                {
+                    FtcMatchId = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    MatchNumber = table.Column<int>(type: "INTEGER", nullable: false),
+                    Field = table.Column<string>(type: "TEXT", nullable: true),
+                    StartTime = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    Series = table.Column<int>(type: "INTEGER", nullable: false),
+                    TournamentLevel = table.Column<int>(type: "INTEGER", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_FtcMatches", x => x.FtcMatchId);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "FtcTeams",
+                columns: table => new
+                {
+                    FtcTeamId = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    TeamNumber = table.Column<int>(type: "INTEGER", nullable: false),
+                    FullName = table.Column<string>(type: "TEXT", maxLength: 255, nullable: true),
+                    ShortName = table.Column<string>(type: "TEXT", maxLength: 255, nullable: true),
+                    SeasonYear = table.Column<int>(type: "INTEGER", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_FtcTeams", x => x.FtcTeamId);
+                });
 
             migrationBuilder.CreateTable(
                 name: "AspNetRoleClaims",
@@ -150,6 +218,57 @@ namespace FIRST.Utilities.Data.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "ActiveFtcEvents",
+                columns: table => new
+                {
+                    EventId = table.Column<int>(type: "INTEGER", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ActiveFtcEvents", x => x.EventId);
+                    table.ForeignKey(
+                        name: "FK_ActiveFtcEvents_FtcEvents_EventId",
+                        column: x => x.EventId,
+                        principalTable: "FtcEvents",
+                        principalColumn: "FtcEventId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "FtcMatchParticipants",
+                columns: table => new
+                {
+                    FtcMatchParticipantId = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    Alliance = table.Column<int>(type: "INTEGER", nullable: false),
+                    Station = table.Column<int>(type: "INTEGER", nullable: false),
+                    FtcMatchId = table.Column<int>(type: "INTEGER", nullable: false),
+                    FtcTeamId = table.Column<int>(type: "INTEGER", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_FtcMatchParticipants", x => x.FtcMatchParticipantId);
+                    table.ForeignKey(
+                        name: "FK_FtcMatchParticipants_FtcMatches_FtcMatchId",
+                        column: x => x.FtcMatchId,
+                        principalTable: "FtcMatches",
+                        principalColumn: "FtcMatchId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_FtcMatchParticipants_FtcTeams_FtcTeamId",
+                        column: x => x.FtcTeamId,
+                        principalTable: "FtcTeams",
+                        principalColumn: "FtcTeamId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateIndex(
+                name: "ProgramCode",
+                table: "ActiveProgramSeasons",
+                column: "ProgramCode",
+                unique: true);
+
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
                 table: "AspNetRoleClaims",
@@ -186,11 +305,52 @@ namespace FIRST.Utilities.Data.Migrations
                 table: "AspNetUsers",
                 column: "NormalizedUserName",
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "EventCode",
+                table: "FtcEvents",
+                column: "EventCode",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "Match_Identification",
+                table: "FtcMatches",
+                columns: new[] { "MatchNumber", "TournamentLevel" },
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_FtcMatchParticipants_FtcTeamId",
+                table: "FtcMatchParticipants",
+                column: "FtcTeamId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Match_Alliance_Station",
+                table: "FtcMatchParticipants",
+                columns: new[] { "FtcMatchId", "Alliance", "Station" },
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Match_Team",
+                table: "FtcMatchParticipants",
+                columns: new[] { "FtcMatchId", "FtcTeamId" },
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "TeamNumber",
+                table: "FtcTeams",
+                column: "TeamNumber",
+                unique: true);
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropTable(
+                name: "ActiveFtcEvents");
+
+            migrationBuilder.DropTable(
+                name: "ActiveProgramSeasons");
+
             migrationBuilder.DropTable(
                 name: "AspNetRoleClaims");
 
@@ -207,10 +367,22 @@ namespace FIRST.Utilities.Data.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
+                name: "FtcMatchParticipants");
+
+            migrationBuilder.DropTable(
+                name: "FtcEvents");
+
+            migrationBuilder.DropTable(
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");
+
+            migrationBuilder.DropTable(
+                name: "FtcMatches");
+
+            migrationBuilder.DropTable(
+                name: "FtcTeams");
         }
     }
 }

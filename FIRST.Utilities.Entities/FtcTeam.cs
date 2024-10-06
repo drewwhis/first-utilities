@@ -19,6 +19,6 @@ public class FtcTeam
     public string? ShortName { get; set; }
     
     public int SeasonYear { get; set; }
-    
-    public IList<FtcMatch> Matches { get; set; }
+
+    public ICollection<FtcMatchParticipant> FtcMatchParticipants { get; set; } = null!;
 }
