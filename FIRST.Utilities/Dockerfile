@@ -9,6 +9,12 @@ ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY ["FIRST.Utilities/FIRST.Utilities.csproj", "FIRST.Utilities/"]
 COPY ["FIRST.Utilities.Client/FIRST.Utilities.Client.csproj", "FIRST.Utilities.Client/"]
+COPY ["FIRST.Utilities.Configuration/FIRST.Utilities.Configuration.csproj", "FIRST.Utilities.Configuration/"]
+COPY ["FIRST.Utilities.DataServices/FIRST.Utilities.DataServices.csproj", "FIRST.Utilities.DataServices/"]
+COPY ["FIRST.Utilities.Entities/FIRST.Utilities.Entities.csproj", "FIRST.Utilities.Entities/"]
+COPY ["FIRST.Utilities.Repositories/FIRST.Utilities.Repositories.csproj", "FIRST.Utilities.Repositories/"]
+COPY ["FIRST.Utilities.Data/FIRST.Utilities.Data.csproj", "FIRST.Utilities.Data/"]
+COPY ["FIRST.Utilities.WebServices/FIRST.Utilities.WebServices.csproj", "FIRST.Utilities.WebServices/"]
 RUN dotnet restore "FIRST.Utilities/FIRST.Utilities.csproj"
 COPY . .
 WORKDIR "/src/FIRST.Utilities"
