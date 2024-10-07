@@ -13,6 +13,7 @@ public partial class LoadEvent : ComponentBase
     private bool _teamsLoaded;
     private bool _qualificationMatchesLoaded;
     private bool _playoffMatchesLoaded;
+    private bool _yearSet;
     private IEnumerable<FtcEvent> _events = [];
     
     [Inject] private IFtcApiService FtcApiService { get; set; } = null!;
@@ -32,8 +33,11 @@ public partial class LoadEvent : ComponentBase
             _teamsLoaded = false;
             _qualificationMatchesLoaded = false;
             _playoffMatchesLoaded = false;
+            _yearSet = false;
             return;
         }
+        
+        _yearSet = true;
         
         _events = FtcEventDataService
             .GetEvents(ftcRecord.SeasonYear)

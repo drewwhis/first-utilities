@@ -3,7 +3,19 @@
 <PageTitle>Data Load</PageTitle>
 <h1>Data Load</h1>
 
-@if (!_isFetching)
+@if (_isFetching)
+{
+    <p>
+        <i>Fetching data from FTC Events...</i>
+    </p>
+}
+else if (!_yearSet)
+{
+    <p>
+        The current <i>FIRST</i><sup>&reg;</sup> Tech Challenge season has not been set.
+    </p>
+}
+else
 {
     <button class="btn btn-primary" @onclick="FetchEventCodes" disabled="@(_activeEvent is not null)">Load Events from FTC</button>
     
@@ -56,10 +68,4 @@
             }
         }
     }
-}
-else
-{
-    <p>
-        <i>Fetching data from FTC Events...</i>
-    </p>
 }
