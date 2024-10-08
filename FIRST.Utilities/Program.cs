@@ -16,6 +16,7 @@ using FIRST.Utilities.Repositories.Interfaces;
 using FIRST.Utilities.WebServices;
 using FIRST.Utilities.WebServices.Interfaces;
 using Microsoft.Extensions.Options;
+using Syncfusion.Blazor;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -26,6 +27,8 @@ builder.Services.AddRazorComponents()
 
 builder.Services.Configure<FtcApiOptions>(
     builder.Configuration.GetSection(FtcApiOptions.OptionName));
+builder.Services.Configure<SyncFusionOptions>(
+    builder.Configuration.GetSection(SyncFusionOptions.OptionName));
 
 builder.Services.AddCascadingAuthenticationState();
 builder.Services.AddScoped<IdentityUserAccessor>();
@@ -85,6 +88,8 @@ builder.Services.AddIdentityCore<ApplicationUser>(options => options.SignIn.Requ
 
 builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSender>();
 
+builder.Services.AddSyncfusionBlazor();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -120,5 +125,8 @@ using (var scope = app.Services.CreateScope())
     // Run Migrations
     db.Database.Migrate();
 }
+
+var syncFusionSettings = app.Services.GetRequiredService<IOptions<SyncFusionOptions>>().Value;
+Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense(syncFusionSettings.License);
 
 app.Run();
