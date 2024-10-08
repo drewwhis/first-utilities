@@ -1,74 +1,86 @@
 @page "/ftc/load-event"
 @rendermode InteractiveServer
+
 <PageTitle>Data Load</PageTitle>
 <h1>Data Load</h1>
 
-@if (_isFetching)
-{
-    <p>
-        <i>Fetching data from FTC Events...</i>
-    </p>
-}
-else if (!_yearSet)
-{
-    <p>
-        The current <i>FIRST</i><sup>&reg;</sup> Tech Challenge season has not been set.
-    </p>
-}
-else
-{
-    <button class="btn btn-primary" @onclick="FetchEventCodes" disabled="@(_activeEvent is not null)">Load Events from FTC</button>
-    
-    @if (_events.Any())
-    {
-        <button class="btn btn-secondary" @onclick="ClearLoadedEvents" disabled="@(_activeEvent is not null)">Clear Loaded Events</button>
-    }
-
-    <br/>
-    <br/>
-
-    @if (_events.Any())
-    {
-        <InputSelect @bind-Value="_selectedEventCode" placeholder="Event" disabled="@(_activeEvent is not null)">
-            @foreach (var ftcEvent in _events)
-            {
-                <option value="@ftcEvent.EventCode">@ftcEvent.EventName</option>
-            }
-        </InputSelect>
-        <br/>
-        <br/>
-        <button class="btn btn-primary" @onclick="SaveSelectedEvent" disabled="@(_activeEvent is not null)">Choose Event</button>
-        @if (_activeEvent is not null)
+<AuthorizeView Roles="UtilitiesAdmin">
+    <Authorized>
+        @if (_isFetching)
         {
-            <button class="btn btn-secondary" @onclick="DeselectEvent" disabled="@_qualificationMatchesLoaded">De-select Event</button>
+            <p>
+                <i>Fetching data from FTC Events...</i>
+            </p>
         }
-        <br />
-        <br />
-        @if (_teamsLoaded)
+        else if (!_yearSet)
         {
-            <p>Teams are loaded.</p>
-            <button class="btn btn-primary" @onclick="LoadQualificationMatches" disabled="@_qualificationMatchesLoaded">Load Qualification Matches</button>
-            <button class="btn btn-primary" @onclick="LoadPlayoffMatches" disabled="@_playoffMatchesLoaded">Load Playoff Matches</button>
-            <br />
-            <br />
-            @if (_qualificationMatchesLoaded)
+            <p>
+                The current <i>FIRST</i><sup>&reg;</sup> Tech Challenge season has not been set.
+            </p>
+        }
+        else
+        {
+            <button class="btn btn-primary" @onclick="FetchEventCodes" disabled="@(_activeEvent is not null)">Load Events from FTC</button>
+            @if (_events.Any())
             {
-                <p>Qualification Matches are loaded.</p>
-                <button class="btn btn-primary" @onclick="AdvanceQualificationMatch" disabled="@(_playoffsActive)">
-                    @(_playoffsActive ? "Playoffs In Progress" : _hasActiveMatch ? "Advance Match" : "Start Qualification Matches")
-                </button>
-                <button class="btn btn-secondary" @onclick="ClearQualificationMatches">Clear Qualification Matches</button>
-                <br />
-                <br />
-            }
-            
-            @if (_playoffMatchesLoaded)
-            {
-                <p>Playoff Matches are loaded.</p>
-                <button class="btn btn-secondary" @onclick="ClearPlayoffMatches">Clear Playoff Matches</button>
+                <button class="btn btn-secondary" @onclick="ClearLoadedEvents" disabled="@(_activeEvent is not null)">Clear Loaded Events</button>
                 <br/>
                 <br/>
+                
+                <InputSelect @bind-Value="_selectedEventCode" placeholder="Event" disabled="@(_activeEvent is not null)">
+                    @foreach (var ftcEvent in _events)
+                    {
+                        <option value="@ftcEvent.EventCode">@ftcEvent.EventName</option>
+                    }
+                </InputSelect>
+                <br/>
+                <br/>
+                <button class="btn btn-primary" @onclick="SaveSelectedEvent" disabled="@(_activeEvent is not null)">Choose Event</button>
+                @if (_activeEvent is not null)
+                {
+                    <button class="btn btn-secondary" @onclick="DeselectEvent" disabled="@_qualificationMatchesLoaded">De-select Event</button>
+                }
+                <br />
+                <br />
+                @if (_teamsLoaded)
+                {
+                    <p>Teams are loaded.</p>
+                    <button class="btn btn-primary" @onclick="LoadQualificationMatches" disabled="@_qualificationMatchesLoaded">Load Qualification Matches</button>
+                    <button class="btn btn-primary" @onclick="LoadPlayoffMatches" disabled="@_playoffMatchesLoaded">Load Playoff Matches</button>
+                    <br />
+                    <br />
+                    @if (_qualificationMatchesLoaded)
+                    {
+                        <p>Qualification Matches are loaded.</p>
+                        <button class="btn btn-secondary" @onclick="ClearQualificationMatches">Clear Qualification Matches</button>
+                        <br />
+                        <br />
+                    }
+
+                    @if (_playoffMatchesLoaded)
+                    {
+                        <p>Playoff Matches are loaded.</p>
+                        <button class="btn btn-secondary" @onclick="ClearPlayoffMatches">Clear Playoff Matches</button>
+                        <br/>
+                        <br/>
+                    }
+                }
             }
         }
-    }
-}
+    </Authorized>
+</AuthorizeView>
+<AuthorizeView Roles="UtilitiesAdmin,FtcEventAdmin">
+    <Authorized>
+        @if (_events.Any() && _teamsLoaded && _qualificationMatchesLoaded)
+        {
+            <button class="btn btn-primary" @onclick="AdvanceQualificationMatch" disabled="@(_playoffsActive)">
+                @(_playoffsActive ? "Playoffs In Progress" : _hasActiveMatch ? "Advance Match" : "Start Qualification Matches")
+            </button>
+        }
+    </Authorized>
+    <NotAuthorized>
+        You do not have permission to view this content.
+    </NotAuthorized>
+</AuthorizeView>
+
+

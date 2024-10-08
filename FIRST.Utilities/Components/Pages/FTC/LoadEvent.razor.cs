@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Components;
 
 namespace FIRST.Utilities.Components.Pages.FTC;
 
-public partial class LoadEvent : ComponentBase
+public partial class LoadEvent
 {
     private bool _isFetching;
     private string? _selectedEventCode;

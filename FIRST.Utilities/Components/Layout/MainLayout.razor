@@ -7,7 +7,20 @@
 
     <main>
         <div class="top-row px-4">
-            <a href="https://learn.microsoft.com/aspnet/core/" target="_blank">About</a>
+            @if (_isAuthenticated)
+            {
+                <form action="/Account/Logout" method="post">
+                    <AntiforgeryToken/>
+                    <input type="hidden" name="ReturnUrl" value=""/>
+                    <button type="submit" class="nav-link">
+                        <span class="bi bi-arrow-bar-left-nav-menu" aria-hidden="true"></span> Logout
+                    </button>
+                </form>
+            }
+            else
+            {
+                <a href="/Account/Login">Login</a>
+            }
         </div>
 
         <article class="content px-4">
