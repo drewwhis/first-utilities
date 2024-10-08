@@ -6,4 +6,8 @@
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\FIRST.Utilities.Entities\FIRST.Utilities.Entities.csproj" />
+    </ItemGroup>
+
 </Project>
