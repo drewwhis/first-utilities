@@ -9,6 +9,11 @@ public class FtcMatchDataService(
     IFtcMatchParticipantRepository ftcMatchParticipants,
     IFtcTeamRepository ftcTeams) : IFtcMatchDataService
 {
+    public IEnumerable<FtcMatch> GetByScheduleType(ScheduleType scheduleType)
+    {
+        return ftcMatches.GetByScheduleType(scheduleType, true);
+    }
+
     public bool AreQualificationMatchesPresent()
     {
         return ftcMatches.GetAll().Any(m => m.TournamentLevel is ScheduleType.QUALIFICATION);
@@ -74,5 +79,25 @@ public class FtcMatchDataService(
 
         var matchSuccess = await ftcMatches.ClearPlayoffMatches();
         return matchSuccess;
+    }
+
+    public async Task<bool> SetActiveMatch(int matchId)
+    {
+        return await ftcMatches.SetActiveMatch(matchId);
+    }
+
+    public async Task<ActiveFtcMatch?> GetActiveMatch()
+    {
+        return await ftcMatches.GetActiveMatch();
+    }
+
+    public async Task<FtcMatch?> GetNextQualificationMatch(FtcMatch match)
+    {
+        return await ftcMatches.GetNextQualificationMatch(match);
+    }
+
+    public async Task<FtcMatch?> GetPreviousQualificationMatch(FtcMatch match)
+    {
+        return await ftcMatches.GetPreviousQualificationMatch(match);
     }
 }

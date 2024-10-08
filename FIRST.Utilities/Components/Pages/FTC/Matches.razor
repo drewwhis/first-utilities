@@ -1,0 +1,86 @@
+@page "/ftc/matches"
+@using FIRST.Utilities.Entities
+<h3>Matches</h3>
+
+@if (!_qualificationMatches.Any())
+{
+    <p>No qualification matches have been loaded for this event.</p>
+}
+else
+{
+    <p>Found @_qualificationMatches.Count() match(es).</p>
+    <table>
+        <thead>
+        <tr>
+            <th>Match Number</th>
+            <th>Field</th>
+            <th>Start Time</th>
+            <th>Red 1</th>
+            <th>Red 2</th>
+            <th>Blue 1</th>
+            <th>Blue 2</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var match in _qualificationMatches)
+        {
+            <tr>
+                <td>@match.MatchNumber</td>
+                <td>@match.Field</td>
+                <td>@match.StartTime</td>
+                @foreach (var participant in match.FtcMatchParticipants
+                              .OrderBy(o => o.Alliance)
+                              .ThenBy(o => o.Station)
+                )
+                {
+                    <td>@participant.FtcTeam.TeamNumber</td>
+                }
+            </tr>
+        }
+        </tbody>
+    </table>
+}
+
+<br/>
+<br/>
+
+@if (!_playoffMatches.Any())
+{
+    <p>No playoff matches have been loaded for this event.</p>
+}
+else
+{
+    <p>Found @_playoffMatches.Count() match(es).</p>
+    <table>
+        <thead>
+        <tr>
+            <th>Playoff Level</th>
+            <th>Series Number</th>
+            <th>Match Number</th>
+            <th>Field</th>
+            <th>Red 1</th>
+            <th>Red 2</th>
+            <th>Blue 1</th>
+            <th>Blue 2</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var match in _playoffMatches)
+        {
+            <tr>
+                <td>@match.TournamentLevel</td>
+                <td>@(match.TournamentLevel == ScheduleType.FINAL ? string.Empty : match.Series)</td>
+                <td>@match.MatchNumber</td>
+                <td>@match.Field</td>
+                @foreach (var participant in match.FtcMatchParticipants
+                              .OrderBy(o => o.Alliance)
+                              .ThenBy(o => o.Station)
+                         )
+                {
+                    <td>@participant.FtcTeam.TeamNumber</td>
+                }
+            </tr>
+        }
+        </tbody>
+    </table>
+}

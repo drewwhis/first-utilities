@@ -4,7 +4,6 @@ using FIRST.Utilities.Configuration;
 using FIRST.Utilities.DataServices.Interfaces;
 using FIRST.Utilities.Entities;
 using FIRST.Utilities.WebServices.Models.FtcApi;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using Moq;
 using ScheduleType = FIRST.Utilities.WebServices.Models.FtcApi.ScheduleType;
@@ -15,12 +14,8 @@ public class FtcApiServiceTests
 {
     private static IHttpClientFactory GetMockFactory()
     {
-        var configuration = new ConfigurationBuilder()
-            .AddUserSecrets<FtcApiServiceTests>()
-            .Build();
-
-        var username = configuration.GetValue<string>("FtcApi:Username")!;
-        var password = configuration.GetValue<string>("FtcApi:Password")!;
+        var username = Environment.GetEnvironmentVariable("FtcApiUsername")!;
+        var password = Environment.GetEnvironmentVariable("FtcApiPassword")!;
 
         var basicAuthenticationValue = Convert.ToBase64String(
             Encoding.ASCII.GetBytes(

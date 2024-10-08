@@ -9,11 +9,14 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="8.0.0" />
-        <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="8.0.0" />
-        <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.0" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.0" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.0" />
+        <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="8.0.8" />
+        <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="8.0.8" />
+        <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.8" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.8" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.8">
+          <PrivateAssets>all</PrivateAssets>
+          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
     </ItemGroup>
     
     <ItemGroup>
@@ -21,14 +24,15 @@
         <ProjectReference Include="..\FIRST.Utilities.Configuration\FIRST.Utilities.Configuration.csproj" />
         <ProjectReference Include="..\FIRST.Utilities.DataServices\FIRST.Utilities.DataServices.csproj" />
         <ProjectReference Include="..\FIRST.Utilities.Entities\FIRST.Utilities.Entities.csproj" />
+        <ProjectReference Include="..\FIRST.Utilities.Models\FIRST.Utilities.Models.csproj" />
         <ProjectReference Include="..\FIRST.Utilities.WebServices\FIRST.Utilities.WebServices.csproj" />
     </ItemGroup>
 
     <ItemGroup>
+      <Content Remove="Data\**" />
       <Content Include="..\.dockerignore">
         <Link>.dockerignore</Link>
       </Content>
-      <Content Remove="Data\**" />
     </ItemGroup>
 
     <ItemGroup>

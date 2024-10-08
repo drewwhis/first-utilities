@@ -1,0 +1,28 @@
+@page "/ftc/teams"
+<h3>Teams</h3>
+
+@if (!_teams.Any())
+{
+    <p>No teams have been loaded for this event.</p>
+}
+else
+{
+    <p>Found @_teams.Count() team(s).</p>
+    <table>
+        <thead>
+        <tr>
+            <th>Team Number</th>
+            <th>Team Name</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var team in _teams)
+        {
+            <tr>
+                <td>@team.TeamNumber</td>
+                <td>@team.ShortName</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}

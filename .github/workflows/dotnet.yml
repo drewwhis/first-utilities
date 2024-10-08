@@ -25,4 +25,7 @@ jobs:
     - name: Build
       run: dotnet build --no-restore
     - name: Test
+      env:
+        "FtcApiUsername": ${{ secrets.FTC_API_USERNAME }}
+        "FtcApiPassword": ${{ secrets.FTC_API_PASSWORD }}
       run: dotnet test --no-build --verbosity normal

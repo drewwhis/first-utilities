@@ -13,6 +13,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<FtcMatch> FtcMatches { get; set; }
     public DbSet<FtcMatchParticipant> FtcMatchParticipants { get; set; }
     public DbSet<ActiveProgramSeason> ActiveProgramSeasons { get; set; }
+    public DbSet<ActiveFtcMatch> ActiveFtcMatches { get; set; }
     
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -21,6 +22,12 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
             .Entity<FtcEvent>()
             .HasOne(e => e.ActiveEvent)
             .WithOne(a => a.Event)
+            .OnDelete(DeleteBehavior.Cascade);
+        
+        modelBuilder
+            .Entity<FtcMatch>()
+            .HasOne(e => e.ActiveMatch)
+            .WithOne(a => a.Match)
             .OnDelete(DeleteBehavior.Cascade);
     }
 }

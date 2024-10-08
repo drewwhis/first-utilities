@@ -18,4 +18,6 @@ public class FtcMatch
     public ScheduleType TournamentLevel { get; set; }
 
     public ICollection<FtcMatchParticipant> FtcMatchParticipants { get; set; } = null!;
+    
+    public ActiveFtcMatch? ActiveMatch { get; set; }
 }

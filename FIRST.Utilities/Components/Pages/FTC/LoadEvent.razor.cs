@@ -13,6 +13,9 @@ public partial class LoadEvent : ComponentBase
     private bool _teamsLoaded;
     private bool _qualificationMatchesLoaded;
     private bool _playoffMatchesLoaded;
+    private bool _yearSet;
+    private bool _hasActiveMatch;
+    private bool _playoffsActive;
     private IEnumerable<FtcEvent> _events = [];
     
     [Inject] private IFtcApiService FtcApiService { get; set; } = null!;
@@ -21,7 +24,7 @@ public partial class LoadEvent : ComponentBase
     [Inject] private IFtcTeamDataService FtcTeamDataService { get; set; } = null!;
     [Inject] private IFtcMatchDataService FtcMatchDataService { get; set; } = null!;
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
         var ftcRecord = ActiveProgramSeasonDataService.GetActiveSeason("FTC");
         if (ftcRecord is null)
@@ -32,9 +35,13 @@ public partial class LoadEvent : ComponentBase
             _teamsLoaded = false;
             _qualificationMatchesLoaded = false;
             _playoffMatchesLoaded = false;
+            _yearSet = false;
+            _hasActiveMatch = false;
+            _playoffsActive = false;
             return;
         }
         
+        _yearSet = true;
         _events = FtcEventDataService
             .GetEvents(ftcRecord.SeasonYear)
             .OrderBy(e => e.EventName);
@@ -45,6 +52,11 @@ public partial class LoadEvent : ComponentBase
         _teamsLoaded = FtcTeamDataService.AreTeamsPresent();
         _qualificationMatchesLoaded = FtcMatchDataService.AreQualificationMatchesPresent();
         _playoffMatchesLoaded = FtcMatchDataService.ArePlayoffMatchesPresent();
+
+        var activeMatch = await FtcMatchDataService.GetActiveMatch();
+        _hasActiveMatch = activeMatch is not null;
+        _playoffsActive = _hasActiveMatch &&
+                          activeMatch!.Match.TournamentLevel is ScheduleType.SEMIFINAL or ScheduleType.FINAL;
     }
 
     private async Task FetchEventCodes()
@@ -214,6 +226,9 @@ public partial class LoadEvent : ComponentBase
     {
         await FtcMatchDataService.ClearQualificationMatches();
         _qualificationMatchesLoaded = FtcMatchDataService.AreQualificationMatchesPresent();
+        var activeMatch = await FtcMatchDataService.GetActiveMatch();
+        _hasActiveMatch = activeMatch is not null;
+        _playoffsActive = _hasActiveMatch && activeMatch!.Match.TournamentLevel is ScheduleType.FINAL or ScheduleType.SEMIFINAL;
         await InvokeAsync(StateHasChanged);
     }
 
@@ -278,6 +293,53 @@ public partial class LoadEvent : ComponentBase
     {
         await FtcMatchDataService.ClearPlayoffMatches();
         _playoffMatchesLoaded = FtcMatchDataService.ArePlayoffMatchesPresent();
+
+        var activeMatch = await FtcMatchDataService.GetActiveMatch();
+        _hasActiveMatch = activeMatch is not null;
+        _playoffsActive = _hasActiveMatch && activeMatch!.Match.TournamentLevel is ScheduleType.FINAL or ScheduleType.SEMIFINAL;
         await InvokeAsync(StateHasChanged);
+    }
+
+    private async Task AdvanceQualificationMatch()
+    {
+        var activeMatch = await FtcMatchDataService.GetActiveMatch();
+        if (activeMatch is null)
+        {
+            var firstQualificationMatch = FtcMatchDataService
+                .GetByScheduleType(ScheduleType.QUALIFICATION)
+                .FirstOrDefault(m => m.MatchNumber == 1);
+            
+            if (firstQualificationMatch is null)
+            {
+                _hasActiveMatch = false;
+                _playoffsActive = false;
+                return;
+            }
+            
+            _hasActiveMatch = await FtcMatchDataService.SetActiveMatch(firstQualificationMatch.FtcMatchId);
+            _playoffsActive = false;
+            return;
+        }
+        
+        var nextMatch = await FtcMatchDataService.GetNextQualificationMatch(activeMatch.Match);
+        if (nextMatch is null)
+        {
+            _hasActiveMatch = true;
+
+            var playoff = FtcMatchDataService
+                .GetByScheduleType(ScheduleType.SEMIFINAL)
+                .FirstOrDefault(m => m is { MatchNumber: 1, Series: 1 });
+
+            if (playoff is not null)
+            {
+                await FtcMatchDataService.SetActiveMatch(playoff.FtcMatchId);
+            }
+            
+            _playoffsActive = playoff is not null;
+            return;
+        }
+        
+        _hasActiveMatch = await FtcMatchDataService.SetActiveMatch(nextMatch.FtcMatchId);
+        _playoffsActive = false;
     }
 }
