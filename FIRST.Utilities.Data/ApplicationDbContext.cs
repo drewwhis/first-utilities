@@ -1,4 +1,5 @@
 using FIRST.Utilities.Entities;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
@@ -29,5 +30,12 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
             .HasOne(e => e.ActiveMatch)
             .WithOne(a => a.Match)
             .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder
+            .Entity<IdentityRole>()
+            .HasData(
+                new IdentityRole("UtilitiesAdmin"),
+                new IdentityRole("FtcEventAdmin")
+            );
     }
 }
