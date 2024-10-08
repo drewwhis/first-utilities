@@ -54,6 +54,9 @@ else
             @if (_qualificationMatchesLoaded)
             {
                 <p>Qualification Matches are loaded.</p>
+                <button class="btn btn-primary" @onclick="AdvanceQualificationMatch" disabled="@(_playoffsActive)">
+                    @(_playoffsActive ? "Playoffs In Progress" : _hasActiveMatch ? "Advance Match" : "Start Qualification Matches")
+                </button>
                 <button class="btn btn-secondary" @onclick="ClearQualificationMatches">Clear Qualification Matches</button>
                 <br />
                 <br />

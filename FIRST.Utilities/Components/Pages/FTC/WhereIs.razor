@@ -1,6 +1,33 @@
 @page "/ftc/where-is"
 <h3>Where Is?</h3>
 
-@code {
-    
+@if (!_teamLocations.Any())
+{
+    <p>No teams have been loaded for this event.</p>
+}
+else if (_inPlayoffs)
+{
+    <p>Playoffs are underway.</p>
+}
+else
+{
+    <table>
+        <thead>
+        <tr>
+            <th>Team Number</th>
+            <th>Team Name</th>
+            <th>Team Location</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var team in _teamLocations)
+        {
+            <tr>
+                <td>@team.TeamNumber</td>
+                <td>@team.TeamName</td>
+                <td>@team.LocationType</td>
+            </tr>
+        }
+        </tbody>
+    </table>
 }

@@ -18,6 +18,7 @@ public partial class NavMenu
     protected override void OnInitialized()
     {
         currentUrl = NavigationManager.ToBaseRelativePath(NavigationManager.Uri);
+        _expandFtc = currentUrl.StartsWith("ftc/");
         NavigationManager.LocationChanged += OnLocationChanged;
     }
 

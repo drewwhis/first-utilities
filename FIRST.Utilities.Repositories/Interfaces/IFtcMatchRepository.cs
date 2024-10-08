@@ -11,4 +11,8 @@ public interface IFtcMatchRepository
     Task<FtcMatch?> Create(FtcMatch ftcMatch);
     Task<bool> ClearQualificationMatches();
     Task<bool> ClearPlayoffMatches();
+    Task<bool> SetActiveMatch(int matchId);
+    Task<ActiveFtcMatch?> GetActiveMatch();
+    Task<FtcMatch?> GetNextQualificationMatch(FtcMatch match);
+    Task<FtcMatch?> GetPreviousQualificationMatch(FtcMatch match);
 }

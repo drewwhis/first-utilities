@@ -93,4 +93,78 @@ public class FtcMatchRepository(ApplicationDbContext context) : IFtcMatchReposit
         {
             return false;
         }    }
+
+    public async Task<bool> SetActiveMatch(int matchId)
+    {
+        var match = context.FtcMatches.FirstOrDefault(m => m.FtcMatchId == matchId);
+        if (match is null) return false;
+        
+        var currentMatch = context.ActiveFtcMatches.FirstOrDefault();
+        if (currentMatch is null)
+        {
+            try
+            {
+                await context.ActiveFtcMatches.AddAsync(new ActiveFtcMatch
+                {
+                    FtcMatchId = matchId,
+                });
+                return await context.SaveChangesAsync() == 1;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        try
+        {
+            context.ActiveFtcMatches.Remove(currentMatch);
+            if (await context.SaveChangesAsync() != 1) return false;
+
+            var newMatch = new ActiveFtcMatch
+            {
+                FtcMatchId = matchId
+            };
+            
+            await context.ActiveFtcMatches.AddAsync(newMatch);
+            return await context.SaveChangesAsync() == 1;
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
+    public async Task<ActiveFtcMatch?> GetActiveMatch()
+    {
+        return await context.ActiveFtcMatches
+            .Include(m => m.Match)
+            .ThenInclude(m => m.FtcMatchParticipants)
+            .ThenInclude(p => p.FtcTeam)
+            .FirstOrDefaultAsync();
+    }
+
+    public async Task<FtcMatch?> GetNextQualificationMatch(FtcMatch match)
+    {
+        if (match.TournamentLevel != ScheduleType.QUALIFICATION) return null;
+        return await context.FtcMatches
+            .Include(m => m.FtcMatchParticipants)
+            .ThenInclude(p => p.FtcTeam)
+            .FirstOrDefaultAsync(m => 
+                m.MatchNumber == match.MatchNumber + 1 
+                && m.TournamentLevel == ScheduleType.QUALIFICATION
+            );
+    }
+
+    public async Task<FtcMatch?> GetPreviousQualificationMatch(FtcMatch match)
+    {
+        if (match.TournamentLevel != ScheduleType.QUALIFICATION) return null;
+        return await context.FtcMatches
+            .Include(m => m.FtcMatchParticipants)
+            .ThenInclude(p => p.FtcTeam)
+            .FirstOrDefaultAsync(m => 
+                m.MatchNumber == match.MatchNumber - 1 
+                && m.TournamentLevel == ScheduleType.QUALIFICATION
+            );    
+    }
 }
