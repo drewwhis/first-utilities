@@ -1,5 +1,7 @@
 @page "/ftc/matches"
+@rendermode InteractiveAuto
 @using FIRST.Utilities.Entities
+@using FIRST.Utilities.Models
 <h3>Matches</h3>
 
 @if (!_qualificationMatches.Any())
@@ -9,36 +11,19 @@
 else
 {
     <p>Found @_qualificationMatches.Count() match(es).</p>
-    <table>
-        <thead>
-        <tr>
-            <th>Match Number</th>
-            <th>Field</th>
-            <th>Start Time</th>
-            <th>Red 1</th>
-            <th>Red 2</th>
-            <th>Blue 1</th>
-            <th>Blue 2</th>
-        </tr>
-        </thead>
-        <tbody>
-        @foreach (var match in _qualificationMatches)
-        {
-            <tr>
-                <td>@match.MatchNumber</td>
-                <td>@match.Field</td>
-                <td>@match.StartTime</td>
-                @foreach (var participant in match.FtcMatchParticipants
-                              .OrderBy(o => o.Alliance)
-                              .ThenBy(o => o.Station)
-                )
-                {
-                    <td>@participant.FtcTeam.TeamNumber</td>
-                }
-            </tr>
-        }
-        </tbody>
-    </table>
+    <SfGrid AllowSorting="true" DataSource="@(_qualificationMatches.Select(m => { 
+        var teams = m.FtcMatchParticipants.OrderBy(p => p.Alliance).ThenBy(p => p.Station).ToList();
+        return new FtcMatchGridElement { MatchNumber = m.MatchNumber, Field = m.Field, StartTime = m.StartTime, Red1TeamNumber = teams[0].FtcTeam.TeamNumber, Red2TeamNumber = teams[1].FtcTeam.TeamNumber, Blue1TeamNumber = teams[2].FtcTeam.TeamNumber, Blue2TeamNumber = teams[3].FtcTeam.TeamNumber }; }))">
+        <GridColumns>
+            <GridColumn Field="@nameof(FtcMatchGridElement.MatchNumber)" HeaderText="Match Number"></GridColumn>
+            <GridColumn Field="@nameof(FtcMatchGridElement.Field)" HeaderText="Field"></GridColumn>
+            <GridColumn Field="@nameof(FtcMatchGridElement.StartTime)" HeaderText="Start Time"></GridColumn>
+            <GridColumn Field="@nameof(FtcMatchGridElement.Red1TeamNumber)" HeaderText="Red 1"></GridColumn>
+            <GridColumn Field="@nameof(FtcMatchGridElement.Red2TeamNumber)" HeaderText="Red 2"></GridColumn>
+            <GridColumn Field="@nameof(FtcMatchGridElement.Blue1TeamNumber)" HeaderText="Blue 1"></GridColumn>
+            <GridColumn Field="@nameof(FtcMatchGridElement.Blue2TeamNumber)" HeaderText="Blue 2"></GridColumn>
+        </GridColumns>
+    </SfGrid>
 }
 
 <br/>
@@ -51,36 +36,19 @@ else
 else
 {
     <p>Found @_playoffMatches.Count() match(es).</p>
-    <table>
-        <thead>
-        <tr>
-            <th>Playoff Level</th>
-            <th>Series Number</th>
-            <th>Match Number</th>
-            <th>Field</th>
-            <th>Red 1</th>
-            <th>Red 2</th>
-            <th>Blue 1</th>
-            <th>Blue 2</th>
-        </tr>
-        </thead>
-        <tbody>
-        @foreach (var match in _playoffMatches)
-        {
-            <tr>
-                <td>@match.TournamentLevel</td>
-                <td>@(match.TournamentLevel == ScheduleType.FINAL ? string.Empty : match.Series)</td>
-                <td>@match.MatchNumber</td>
-                <td>@match.Field</td>
-                @foreach (var participant in match.FtcMatchParticipants
-                              .OrderBy(o => o.Alliance)
-                              .ThenBy(o => o.Station)
-                         )
-                {
-                    <td>@participant.FtcTeam.TeamNumber</td>
-                }
-            </tr>
-        }
-        </tbody>
-    </table>
+    
+    <SfGrid AllowSorting="true" DataSource="@(_playoffMatches.Select(m => { 
+        var teams = m.FtcMatchParticipants.OrderBy(p => p.Alliance).ThenBy(p => p.Station).ToList();
+        return new FtcMatchGridElement { MatchNumber = m.MatchNumber, SeriesNumber = m.TournamentLevel == ScheduleType.FINAL ? string.Empty : $"{m.Series}", TournamentLevel = m.TournamentLevel, Field = m.Field, StartTime = m.StartTime, Red1TeamNumber = teams[0].FtcTeam.TeamNumber, Red2TeamNumber = teams[1].FtcTeam.TeamNumber, Blue1TeamNumber = teams[2].FtcTeam.TeamNumber, Blue2TeamNumber = teams[3].FtcTeam.TeamNumber }; }))">
+        <GridColumns>
+            <GridColumn Field="@nameof(FtcMatchGridElement.TournamentLevel)" HeaderText="Playoff Level"></GridColumn>
+            <GridColumn Field="@nameof(FtcMatchGridElement.SeriesNumber)" HeaderText="Series Number"></GridColumn>
+            <GridColumn Field="@nameof(FtcMatchGridElement.MatchNumber)" HeaderText="Match Number"></GridColumn>
+            <GridColumn Field="@nameof(FtcMatchGridElement.Field)" HeaderText="Field"></GridColumn>
+            <GridColumn Field="@nameof(FtcMatchGridElement.Red1TeamNumber)" HeaderText="Red 1"></GridColumn>
+            <GridColumn Field="@nameof(FtcMatchGridElement.Red2TeamNumber)" HeaderText="Red 2"></GridColumn>
+            <GridColumn Field="@nameof(FtcMatchGridElement.Blue1TeamNumber)" HeaderText="Blue 1"></GridColumn>
+            <GridColumn Field="@nameof(FtcMatchGridElement.Blue2TeamNumber)" HeaderText="Blue 2"></GridColumn>
+        </GridColumns>
+    </SfGrid>
 }

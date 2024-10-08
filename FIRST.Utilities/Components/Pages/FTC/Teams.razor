@@ -1,4 +1,6 @@
 @page "/ftc/teams"
+@rendermode InteractiveAuto
+@using FIRST.Utilities.Entities
 <h3>Teams</h3>
 
 @if (!_teams.Any())
@@ -8,21 +10,14 @@
 else
 {
     <p>Found @_teams.Count() team(s).</p>
-    <table>
-        <thead>
-        <tr>
-            <th>Team Number</th>
-            <th>Team Name</th>
-        </tr>
-        </thead>
-        <tbody>
-        @foreach (var team in _teams)
-        {
-            <tr>
-                <td>@team.TeamNumber</td>
-                <td>@team.ShortName</td>
-            </tr>
-        }
-        </tbody>
-    </table>
+    <SfGrid AllowSorting="true" DataSource="_teams">
+        <GridColumns>
+            <GridColumn 
+                Field="@nameof(FtcTeam.TeamNumber)" 
+                HeaderText="Team Number"></GridColumn>
+            <GridColumn
+                Field="@nameof(FtcTeam.ShortName)"
+                HeaderText="Team Name"></GridColumn>
+        </GridColumns>
+    </SfGrid>
 }

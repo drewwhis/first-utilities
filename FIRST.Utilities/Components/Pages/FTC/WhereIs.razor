@@ -1,4 +1,6 @@
 @page "/ftc/where-is"
+@rendermode InteractiveAuto
+@using FIRST.Utilities.Models
 <h3>Where Is?</h3>
 
 @if (!_teamLocations.Any())
@@ -11,23 +13,11 @@ else if (_inPlayoffs)
 }
 else
 {
-    <table>
-        <thead>
-        <tr>
-            <th>Team Number</th>
-            <th>Team Name</th>
-            <th>Team Location</th>
-        </tr>
-        </thead>
-        <tbody>
-        @foreach (var team in _teamLocations)
-        {
-            <tr>
-                <td>@team.TeamNumber</td>
-                <td>@team.TeamName</td>
-                <td>@team.LocationType</td>
-            </tr>
-        }
-        </tbody>
-    </table>
+    <SfGrid AllowSorting="true" DataSource="_teamLocations">
+        <GridColumns>
+            <GridColumn Field="@nameof(TeamLocation.TeamNumber)" HeaderText="Team Number"></GridColumn>
+            <GridColumn Field="@nameof(TeamLocation.TeamName)" HeaderText="Team Name"></GridColumn>
+            <GridColumn Field="@nameof(TeamLocation.LocationType)" HeaderText="Team Location"></GridColumn>
+        </GridColumns>
+    </SfGrid>
 }
